@@ -9,9 +9,12 @@ void menu()
 {
     SetTargetFPS(60);
     bool starting = false;
+    Image title_image = LoadImage("assets/title.png");
+    ImageResize(&title_image, 554, 202);
+    Texture2D title = LoadTextureFromImage(title_image);
     Texture2D button = LoadTexture("assets/button.png");
-    Rectangle button_hitbox_play = {X_POS, 250, 371, 99};
-    Rectangle button_hitbox_option = {X_POS, 450, 371, 99};
+    Rectangle button_hitbox_play = {X_POS, 230, 371, 99};
+    Rectangle button_hitbox_option = {X_POS, 400, 371, 99};
     Texture2D shop_tex = LoadTexture("assets/cart.png");
     shop_tex.height = 128;
     shop_tex.width = 128;
@@ -31,11 +34,12 @@ void menu()
         Color tint = hover ? GRAY : WHITE;
         Color tint_option = hover_option ? GRAY : WHITE;
         Color tint_shop = hover_shop ? GREEN : WHITE;
-        DrawTexture(button, X_POS, 250, tint);
-        DrawTexture(button, X_POS, 450, tint_option);
+        DrawTexture(title, 130, 0, WHITE);
+        DrawTexture(button, X_POS, 230, tint);
+        DrawTexture(button, X_POS, 400, tint_option);
         DrawTexture(shop_tex, 800-128, 900-128, tint_shop);
-        DrawText("PLAY", 340, 280, 40, tint);
-        DrawText("OPTION", 320, 480, 40, tint_option);
+        DrawText("PLAY", 340, 260, 40, tint);
+        DrawText("OPTION", 320, 430, 40, tint_option);
         EndDrawing();
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover)
             starting = true;

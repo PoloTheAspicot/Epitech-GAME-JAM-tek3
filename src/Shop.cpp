@@ -1,8 +1,6 @@
 #include <raylib.h>
 #include <cstdlib>
 
-#define X_POS (800-371)/2
-
 void shop()
 {
     bool starting = false;
@@ -16,6 +14,8 @@ void shop()
         BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawTexture(bg, 0, 0, WHITE);
+        DrawText("COMMING SOON", 160, 400, 60, RED);
+        DrawText("Press enter to return", 260, 500, 20, BLACK);
         EndDrawing();
         if (IsKeyPressed(KEY_ENTER))
             starting = true;

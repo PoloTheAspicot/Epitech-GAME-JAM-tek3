@@ -3,8 +3,6 @@
 #include <string>
 #include "Config.hpp"
 
-#define X_POS (800-371)/2
-
 const char* GetKeyName(int key) {
     switch (key) {
         case KEY_UP: return "UP";
@@ -19,6 +17,28 @@ const char* GetKeyName(int key) {
         case KEY_E: return "E";
         case KEY_R: return "R";
         case KEY_T: return "T";
+        case KEY_Y: return "Y";
+        case KEY_U: return "U";
+        case KEY_I: return "I";
+        case KEY_O: return "O";
+        case KEY_P: return "P";
+        case KEY_F: return "F";
+        case KEY_G: return "G";
+        case KEY_H: return "H";
+        case KEY_J: return "J";
+        case KEY_K: return "K";
+        case KEY_L: return "L";
+        case KEY_Z: return "W";
+        case KEY_X: return "X";
+        case KEY_C: return "C";
+        case KEY_V: return "V";
+        case KEY_B: return "B";
+        case KEY_N: return "N";
+        case KEY_SEMICOLON: return "M";
+        case KEY_EIGHT: return "8";
+        case KEY_FOUR: return "4";
+        case KEY_SIX: return "6";
+        case KEY_TWO: return "2";
         case KEY_SPACE: return "SPACE";
         case KEY_ENTER: return "ENTER";
         default: return "UNKNOWN";
@@ -32,7 +52,7 @@ void option()
     bg.height = 900;
     bg.width = 800;
 
-    int selecting = -1; // -1: none, 0: up, 1: down, 2: left, 3: right
+    int selecting = -1;
 
     while (!WindowShouldClose() && !starting)
     {
@@ -66,22 +86,17 @@ void option()
         ClearBackground(RAYWHITE);
         DrawTexture(bg, 0, 0, WHITE);
 
-        DrawText("OPTIONS - KEYBINDINGS", 250, 100, 30, BLACK);
+        DrawText("OPTIONS - KEYBINDINGS", 200, 100, 30, BLACK);
         DrawText("Click to remap", 320, 150, 20, DARKGRAY);
-
         DrawRectangleRec(rectUp, selecting == 0 ? LIGHTGRAY : GRAY);
         DrawText(TextFormat("UP: %s", GetKeyName(Config::KEY_UP_MOVE)), rectUp.x + 10, rectUp.y + 10, 20, BLACK);
-
         DrawRectangleRec(rectDown, selecting == 1 ? LIGHTGRAY : GRAY);
         DrawText(TextFormat("DOWN: %s", GetKeyName(Config::KEY_DOWN_MOVE)), rectDown.x + 10, rectDown.y + 10, 20, BLACK);
-
         DrawRectangleRec(rectLeft, selecting == 2 ? LIGHTGRAY : GRAY);
         DrawText(TextFormat("LEFT: %s", GetKeyName(Config::KEY_LEFT_MOVE)), rectLeft.x + 10, rectLeft.y + 10, 20, BLACK);
-
         DrawRectangleRec(rectRight, selecting == 3 ? LIGHTGRAY : GRAY);
         DrawText(TextFormat("RIGHT: %s", GetKeyName(Config::KEY_RIGHT_MOVE)), rectRight.x + 10, rectRight.y + 10, 20, BLACK);
-
-        DrawText("Press ENTER to return", 280, 500, 20, BLACK);
+        DrawText("Press ENTER to save", 290, 500, 20, BLACK);
 
         EndDrawing();
         if (IsKeyPressed(KEY_ENTER) && selecting == -1)
