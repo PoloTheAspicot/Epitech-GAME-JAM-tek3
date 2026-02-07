@@ -32,10 +32,10 @@ class Tomato : public AEntity {
   private:
     void input() {
         velocity = {0, 0};
-        if (IsKeyDown(Config::KEY_RIGHT_MOVE)) velocity.x = 2.0f;
-        if (IsKeyDown(Config::KEY_LEFT_MOVE)) velocity.x = -2.0f;
-        if (IsKeyDown(Config::KEY_UP_MOVE)) velocity.y = -2.0f;
-        if (IsKeyDown(Config::KEY_DOWN_MOVE)) velocity.y = 2.0f;
+        if (IsKeyDown(Config::KEY_RIGHT_MOVE)) velocity.x = 3.0f;
+        if (IsKeyDown(Config::KEY_LEFT_MOVE)) velocity.x = -3.0f;
+        if (IsKeyDown(Config::KEY_UP_MOVE)) velocity.y = -3.0f;
+        if (IsKeyDown(Config::KEY_DOWN_MOVE)) velocity.y = 3.0f;
     }
 };
 

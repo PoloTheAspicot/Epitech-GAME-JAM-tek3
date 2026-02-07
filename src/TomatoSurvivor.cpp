@@ -1,5 +1,6 @@
 #include <random>
 #include <algorithm>
+#include <iostream>
 
 #include "entity/Tomato.hpp"
 #include "entity/Arrow.hpp"
@@ -119,6 +120,10 @@ void TomatoSurvivor::checkCollisionsBonuses() {
             bonus->getPosition(), bonus->getRadius())) {
             _timer += 10;
             _score += 100;
+            if (_score >= _next_DifficultyLevel) {
+                increaseDifficulty();
+                _next_DifficultyLevel += DIFFICULTY_INC;
+            }
             _bonuses.erase(std::remove(_bonuses.begin(), _bonuses.end(), bonus), _bonuses.end());
             spawnBonus();
         }
@@ -130,28 +135,37 @@ void TomatoSurvivor::spawnArrow() {
     Vector2 vel = {0.0, 0.0};
 
     if (rand() % 2) {
-        pos.x = (int)rand() % (int)WINDOW_SIZE.x;
+        pos.x = (int)rand() % ((int)GAME_SIZE.x - 100) + 100;
         vel.y = _arrowSpeed;
         if (rand() % 2) {
             vel.y *= -1;
-            pos.y = WINDOW_SIZE.y;
+            pos.y = GAME_SIZE.y;
         }
         vel.x = rand() % 3 * (pos.x < 400 ? 1 : -1);
     } else {
-        pos.y = (int)rand() % (int)WINDOW_SIZE.y;
+        pos.y = (int)rand() % ((int)GAME_SIZE.y - 100) + 100;
         vel.x = _arrowSpeed;
         if (rand() % 2) {
             vel.x *= -1;
-            pos.x = WINDOW_SIZE.x;
+            pos.x = GAME_SIZE.x;
         }
         vel.y = rand() % 3 * (pos.y < 400 ? 1 : -1);
     }
     _arrows.emplace_back(std::make_unique<Arrow>(_arrowSize, pos, vel));
+    // std::cerr << "creating arrow at: " << pos.x << ", " << pos.y << " vel: " << vel.x << ", " << vel.y << std::endl;
 }
 
 void TomatoSurvivor::spawnBonus() {
     _bonuses.emplace_back(std::make_unique<Bonus>(
         _bonusSize, (int)rand() % (int)GAME_SIZE.x, (int)rand() % (int)GAME_SIZE.y));
+}
+
+void TomatoSurvivor::increaseDifficulty() {
+    _arrowSpeed *= 1.2;
+    _arrowSize += 1.0;
+    _arrowDamage *= 1.5;
+    _arrowSpawnDelay *= 0.8;
+    _maxNumberArrows += 1.0;
 }
 
 } // namespace TomatoSurvivor
