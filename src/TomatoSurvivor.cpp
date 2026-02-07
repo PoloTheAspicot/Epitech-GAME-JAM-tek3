@@ -14,7 +14,7 @@ TomatoSurvivor::TomatoSurvivor() {
     srand(time(0));
     SetTargetFPS(60);
 
-    _tomato = std::make_unique<Tomato>(WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
+    _tomato = std::make_unique<Tomato>(_playerSize, WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
     spawnBonus();
 }
 
@@ -23,12 +23,29 @@ TomatoSurvivor::~TomatoSurvivor() {
 }
 
 void TomatoSurvivor::update() {
-    if (_tomato)
+    if (_tomato) {
         _tomato->update();
-    for (auto &arrow : _arrows)
+        if (_tomato->getPosition().x > GAME_SIZE.x)
+            _tomato->setPosition({GAME_SIZE.x, _tomato->getPosition().y});
+        if (_tomato->getPosition().y > GAME_SIZE.y)
+            _tomato->setPosition({_tomato->getPosition().x, GAME_SIZE.y});
+        if (_tomato->getPosition().x < 0)
+            _tomato->setPosition({0, _tomato->getPosition().y});
+        if (_tomato->getPosition().y < 0)
+            _tomato->setPosition({_tomato->getPosition().x, 0});
+    }
+    for (unsigned int i = 0; i < _arrows.size(); i++) {
+        auto &arrow = _arrows[i];
         arrow->update();
-    for (auto &bonus : _bonuses)
-        bonus->update();
+        if (arrow->getPosition().x > GAME_SIZE.x)
+            _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
+        else if (arrow->getPosition().y > GAME_SIZE.y)
+            _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
+        else if (arrow->getPosition().x < 0)
+            _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
+        else if (arrow->getPosition().y < 0)
+            _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
+    }
 }
 
 void TomatoSurvivor::render() {
@@ -41,8 +58,16 @@ void TomatoSurvivor::render() {
         arrow->render();
     for (auto &bonus : _bonuses)
         bonus->render();
-    DrawText(TextFormat("TIME: %.0f SECONDS", _timer), 10, 10, 20, BLACK);
-    DrawText(TextFormat("SCORE: %.0f", _score), 10, 30, 20, BLACK);
+    DrawRectangle(0, 0, 800, 100, LIGHTGRAY);
+
+    DrawText(TextFormat(TEXT_TIME), 10, 10, 35, BLACK);
+    DrawText(TextFormat("%.1f", _timer), 10 + TextLength(TEXT_TIME) * 20, 10, 35, RED);
+    DrawText(TextFormat(TEXT_SCORE), 10, 55, 35, BLACK);
+    DrawText(TextFormat("%.0f", _score), 10 + TextLength(TEXT_SCORE) * 20, 55, 35, RED);
+    DrawText(TextFormat(TEXT_SHOP), 350, 10, 35, BLACK);
+    DrawText(TextFormat("%.1f", _nextShopSpawn), 350 + TextLength(TEXT_SHOP) * 20, 10, 35, RED);
+    DrawText(TextFormat(TEXT_ARROW), 350, 55, 35, BLACK);
+    DrawText(TextFormat("%.1f", std::abs(_nextArrowSpawn)), 350 + TextLength(TEXT_ARROW) * 20, 55, 35, RED);
 
     EndDrawing();
 }
@@ -50,6 +75,18 @@ void TomatoSurvivor::render() {
 void TomatoSurvivor::loop() {
     while (!WindowShouldClose()) {
         _timer -= GetFrameTime();
+        _nextShopSpawn -= GetFrameTime();
+        if (_nextArrowSpawn > 0)
+            _nextArrowSpawn -= GetFrameTime();
+        if (_playerInvicibility > 0)
+            _playerInvicibility -= GetFrameTime();
+        if (_nextShopSpawn <= 0) {
+            _nextShopSpawn = _spawnShopDelay;
+        }
+        if (_nextArrowSpawn <= 0 && _arrows.size() < _maxNumberArrows) {
+            _nextArrowSpawn = _arrowSpawnDelay;
+            spawnArrow();
+        }
         update();
         checkCollisions();
         render();
@@ -62,6 +99,18 @@ void TomatoSurvivor::checkCollisions() {
 }
 
 void TomatoSurvivor::checkCollisionsArrows() {
+    if (_playerInvicibility > 0)
+        return;
+    for (unsigned int i = 0; i < _arrows.size(); i++) {
+        auto &arrow = _arrows[i];
+        arrow->update();
+        if (CheckCollisionCircles(_tomato->getPosition(), _tomato->getRadius(),
+            arrow->getPosition(), arrow->getRadius())) {
+            _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
+            _timer -= _arrowDamage;
+            _playerInvicibility = _invicibilityTime;
+        }
+    }
 }
 
 void TomatoSurvivor::checkCollisionsBonuses() {
@@ -77,13 +126,32 @@ void TomatoSurvivor::checkCollisionsBonuses() {
 }
 
 void TomatoSurvivor::spawnArrow() {
-    // _arrows.push_back(std::make_unique<Arrow>(
-    //     (int)rand() % (int)WINDOW_SIZE.x, (int)rand() % (int)WINDOW_SIZE.y));
+    Vector2 pos = {0.0, 0.0};
+    Vector2 vel = {0.0, 0.0};
+
+    if (rand() % 2) {
+        pos.x = (int)rand() % (int)WINDOW_SIZE.x;
+        vel.y = _arrowSpeed;
+        if (rand() % 2) {
+            vel.y *= -1;
+            pos.y = WINDOW_SIZE.y;
+        }
+        vel.x = rand() % 3 * (pos.x < 400 ? 1 : -1);
+    } else {
+        pos.y = (int)rand() % (int)WINDOW_SIZE.y;
+        vel.x = _arrowSpeed;
+        if (rand() % 2) {
+            vel.x *= -1;
+            pos.x = WINDOW_SIZE.x;
+        }
+        vel.y = rand() % 3 * (pos.y < 400 ? 1 : -1);
+    }
+    _arrows.emplace_back(std::make_unique<Arrow>(_arrowSize, pos, vel));
 }
 
 void TomatoSurvivor::spawnBonus() {
-    _bonuses.push_back(std::make_unique<Bonus>(
-        (int)rand() % (int)WINDOW_SIZE.x, (int)rand() % (int)WINDOW_SIZE.y));
+    _bonuses.emplace_back(std::make_unique<Bonus>(
+        _bonusSize, (int)rand() % (int)GAME_SIZE.x, (int)rand() % (int)GAME_SIZE.y));
 }
 
 } // namespace TomatoSurvivor
