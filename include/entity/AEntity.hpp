@@ -12,11 +12,15 @@ class AEntity : public IEntity {
     void update() = 0;
 
     void render() override {
-        DrawCircleV(position, radius, color);
+        DrawCircleV({position.x, position.y + 100}, radius, color);
     }
 
     Vector2 getPosition() const override {
         return position;
+    }
+
+    void setPosition(Vector2 _position) override {
+        position = _position;
     }
 
     int getRadius() const {
