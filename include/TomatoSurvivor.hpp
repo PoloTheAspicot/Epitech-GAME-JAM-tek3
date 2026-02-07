@@ -20,13 +20,13 @@ class TomatoSurvivor {
     void update();
     void render();
     void checkCollisions();
-    void checkCollisionsSwords();
+    void checkCollisionsArrows();
     void checkCollisionsBonuses();
-    void spawnSword();
+    void spawnArrow();
     void spawnBonus();
 
     std::unique_ptr<IEntity> _tomato;
-    std::vector<std::unique_ptr<IEntity>> _swords;
+    std::vector<std::unique_ptr<IEntity>> _arrows;
     std::vector<std::unique_ptr<IEntity>> _bonuses;
     float _timer = 300;
     float _score = 0;

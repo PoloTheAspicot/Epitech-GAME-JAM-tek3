@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #include "entity/Tomato.hpp"
-#include "entity/Sword.hpp"
+#include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
 #include "TomatoSurvivor.hpp"
 
@@ -13,7 +13,7 @@ TomatoSurvivor::TomatoSurvivor() {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "raylib [core] example - input keys");
     srand(time(0));
     SetTargetFPS(60);
-    
+
     _tomato = std::make_unique<Tomato>(WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
     spawnBonus();
 }
@@ -25,8 +25,8 @@ TomatoSurvivor::~TomatoSurvivor() {
 void TomatoSurvivor::update() {
     if (_tomato)
         _tomato->update();
-    for (auto &sword : _swords)
-        sword->update();
+    for (auto &arrow : _arrows)
+        arrow->update();
     for (auto &bonus : _bonuses)
         bonus->update();
 }
@@ -37,8 +37,8 @@ void TomatoSurvivor::render() {
 
     if (_tomato)
         _tomato->render();
-    for (auto &sword : _swords)
-        sword->render();
+    for (auto &arrow : _arrows)
+        arrow->render();
     for (auto &bonus : _bonuses)
         bonus->render();
     DrawText(TextFormat("TIME: %.0f SECONDS", _timer), 10, 10, 20, BLACK);
@@ -57,11 +57,11 @@ void TomatoSurvivor::loop() {
 }
 
 void TomatoSurvivor::checkCollisions() {
-    checkCollisionsSwords();
+    checkCollisionsArrows();
     checkCollisionsBonuses();
 }
 
-void TomatoSurvivor::checkCollisionsSwords() {
+void TomatoSurvivor::checkCollisionsArrows() {
 }
 
 void TomatoSurvivor::checkCollisionsBonuses() {
@@ -76,8 +76,8 @@ void TomatoSurvivor::checkCollisionsBonuses() {
     }
 }
 
-void TomatoSurvivor::spawnSword() {
-    // _swords.push_back(std::make_unique<Sword>(
+void TomatoSurvivor::spawnArrow() {
+    // _arrows.push_back(std::make_unique<Arrow>(
     //     (int)rand() % (int)WINDOW_SIZE.x, (int)rand() % (int)WINDOW_SIZE.y));
 }
 
