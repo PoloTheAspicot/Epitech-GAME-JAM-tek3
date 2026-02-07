@@ -3,6 +3,7 @@
 #include "Option.hpp"
 #include "Shop.hpp"
 #include "Save.hpp"
+#include "Menu.hpp"
 
 #define X_POS (800-371)/2
 
@@ -23,6 +24,7 @@ void menu()
     Texture2D bg = LoadTexture("assets/background.jpg");
     bg.height = 900;
     bg.width = 800;
+    
     while (!WindowShouldClose() && !starting)
     {
         Vector2 mouse = GetMousePosition();
@@ -41,6 +43,8 @@ void menu()
         DrawTexture(shop_tex, 800-128, 900-128, tint_shop);
         DrawText("PLAY", 340, 260, 40, tint);
         DrawText("OPTION", 320, 430, 40, tint_option);
+        DrawText(TextFormat("Highest Score: %d", SaveManager::getBestScore()), 200, 620, 40, DARKBLUE);
+        
         EndDrawing();
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover)
             starting = true;
@@ -49,11 +53,10 @@ void menu()
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_shop)
             shop();
     }
-    ClearBackground(RAYWHITE);
-    if (!starting) {
-        // write save before exiting
-        SaveManager::writeSave();
-        CloseWindow();
-        exit(0);
-    }
+    
+    UnloadTexture(title);
+    UnloadTexture(button);
+    UnloadTexture(shop_tex);
+    UnloadTexture(bg);
+    UnloadImage(title_image);
 }

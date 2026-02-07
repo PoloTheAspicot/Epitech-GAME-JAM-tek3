@@ -17873,61 +17873,6 @@ boundaries compute_boundaries(FloatType value)
     return {diyfp::normalize(v), w_minus, w_plus};
 }
 
-// Given normalized diyfp w, Grisu needs to find a (normalized) cached
-// power-of-ten c, such that the exponent of the product c * w = f * 2^e lies
-// within a certain range [alpha, gamma] (Definition 3.2 from [1])
-//
-//      alpha <= e = e_c + e_w + q <= gamma
-//
-// or
-//
-//      f_c * f_w * 2^alpha <= f_c 2^(e_c) * f_w 2^(e_w) * 2^q
-//                          <= f_c * f_w * 2^gamma
-//
-// Since c and w are normalized, i.e. 2^(q-1) <= f < 2^q, this implies
-//
-//      2^(q-1) * 2^(q-1) * 2^alpha <= c * w * 2^q < 2^q * 2^q * 2^gamma
-//
-// or
-//
-//      2^(q - 2 + alpha) <= c * w < 2^(q + gamma)
-//
-// The choice of (alpha,gamma) determines the size of the table and the form of
-// the digit generation procedure. Using (alpha,gamma)=(-60,-32) works out well
-// in practice:
-//
-// The idea is to cut the number c * w = f * 2^e into two parts, which can be
-// processed independently: An integral part p1, and a fractional part p2:
-//
-//      f * 2^e = ( (f div 2^-e) * 2^-e + (f mod 2^-e) ) * 2^e
-//              = (f div 2^-e) + (f mod 2^-e) * 2^e
-//              = p1 + p2 * 2^e
-//
-// The conversion of p1 into decimal form requires a series of divisions and
-// modulos by (a power of) 10. These operations are faster for 32-bit than for
-// 64-bit integers, so p1 should ideally fit into a 32-bit integer. This can be
-// achieved by choosing
-//
-//      -e >= 32   or   e <= -32 := gamma
-//
-// In order to convert the fractional part
-//
-//      p2 * 2^e = p2 / 2^-e = d[-1] / 10^1 + d[-2] / 10^2 + ...
-//
-// into decimal form, the fraction is repeatedly multiplied by 10 and the digits
-// d[-i] are extracted in order:
-//
-//      (10 * p2) div 2^-e = d[-1]
-//      (10 * p2) mod 2^-e = d[-2] / 10^1 + ...
-//
-// The multiplication by 10 must not overflow. It is sufficient to choose
-//
-//      10 * p2 < 16 * p2 = 2^4 * p2 <= 2^64.
-//
-// Since p2 = f mod 2^-e < 2^-e,
-//
-//      -e <= 60   or   e >= -60 := alpha
-
 constexpr int kAlpha = -60;
 constexpr int kGamma = -32;
 
@@ -17938,64 +17883,8 @@ struct cached_power // c = f * 2^e ~= 10^k
     int k;
 };
 
-/*!
-For a normalized diyfp w = f * 2^e, this function returns a (normalized) cached
-power-of-ten c = f_c * 2^e_c, such that the exponent of the product w * c
-satisfies (Definition 3.2 from [1])
-
-     alpha <= e_c + e + q <= gamma.
-*/
 inline cached_power get_cached_power_for_binary_exponent(int e)
 {
-    // Now
-    //
-    //      alpha <= e_c + e + q <= gamma                                    (1)
-    //      ==> f_c * 2^alpha <= c * 2^e * 2^q
-    //
-    // and since the c's are normalized, 2^(q-1) <= f_c,
-    //
-    //      ==> 2^(q - 1 + alpha) <= c * 2^(e + q)
-    //      ==> 2^(alpha - e - 1) <= c
-    //
-    // If c were an exact power of ten, i.e. c = 10^k, one may determine k as
-    //
-    //      k = ceil( log_10( 2^(alpha - e - 1) ) )
-    //        = ceil( (alpha - e - 1) * log_10(2) )
-    //
-    // From the paper:
-    // "In theory the result of the procedure could be wrong since c is rounded,
-    //  and the computation itself is approximated [...]. In practice, however,
-    //  this simple function is sufficient."
-    //
-    // For IEEE double precision floating-point numbers converted into
-    // normalized diyfp's w = f * 2^e, with q = 64,
-    //
-    //      e >= -1022      (min IEEE exponent)
-    //           -52        (p - 1)
-    //           -52        (p - 1, possibly normalize denormal IEEE numbers)
-    //           -11        (normalize the diyfp)
-    //         = -1137
-    //
-    // and
-    //
-    //      e <= +1023      (max IEEE exponent)
-    //           -52        (p - 1)
-    //           -11        (normalize the diyfp)
-    //         = 960
-    //
-    // This binary exponent range [-1137,960] results in a decimal exponent
-    // range [-307,324]. One does not need to store a cached power for each
-    // k in this range. For each such k it suffices to find a cached power
-    // such that the exponent of the product lies in [alpha,gamma].
-    // This implies that the difference of the decimal exponents of adjacent
-    // table entries must be less than or equal to
-    //
-    //      floor( (gamma - alpha) * log_10(2) ) = 8.
-    //
-    // (A smaller distance gamma-alpha would require a larger table.)
-
-    // NB:
-    // Actually this function returns c, such that -60 <= e_c + e + 64 <= -34.
 
     constexpr int kCachedPowersMinDecExp = -300;
     constexpr int kCachedPowersDecStep = 8;

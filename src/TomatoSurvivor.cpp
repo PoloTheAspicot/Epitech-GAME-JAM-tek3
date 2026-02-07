@@ -6,21 +6,44 @@
 #include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
 #include "TomatoSurvivor.hpp"
+#include "Pause.hpp"
 
 namespace TomatoSurvivor
 {
 
 TomatoSurvivor::TomatoSurvivor() {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Tomato Survivor");
+    InitAudioDevice();
     srand(time(0));
     SetTargetFPS(60);
 
     _tomato = std::make_unique<Tomato>(_playerSize, WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
     spawnBonus();
+    music = LoadMusicStream("assets/Tears.ogg");
+    volume = 0.9f;
+    pan = 0.0f;
+    SetMusicPan(music, pan);
+    SetMusicVolume(music, volume);
+    still_alive = true;
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
     CloseWindow();
+}
+
+void TomatoSurvivor::reset() {
+    _arrows.clear();
+    _bonuses.clear();
+    _timer = 300.0;
+    _score = 0.0;
+    _nextArrowSpawn = _arrowSpawnDelay;
+    _nextShopSpawn = _spawnShopDelay;
+    _playerInvicibility = 0.0;
+    _tomato->setPosition({WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2});
+    spawnBonus();
+    still_alive = true;
+    return_to_menu = false;
+    abandoned = false;
 }
 
 void TomatoSurvivor::update() {
@@ -38,6 +61,8 @@ void TomatoSurvivor::update() {
     for (unsigned int i = 0; i < _arrows.size(); i++) {
         auto &arrow = _arrows[i];
         arrow->update();
+    for (auto &bonus : _bonuses)
+        bonus->update();
         if (arrow->getPosition().x > GAME_SIZE.x)
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
         else if (arrow->getPosition().y > GAME_SIZE.y)
@@ -47,6 +72,7 @@ void TomatoSurvivor::update() {
         else if (arrow->getPosition().y < 0)
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
     }
+    UpdateMusicStream(music);
 }
 
 void TomatoSurvivor::render() {
@@ -74,13 +100,15 @@ void TomatoSurvivor::render() {
 }
 
 void TomatoSurvivor::loop() {
-    while (!WindowShouldClose()) {
+    PlayMusicStream(music);
+    while (!WindowShouldClose() && still_alive) {
         _timer -= GetFrameTime();
         _nextShopSpawn -= GetFrameTime();
         if (_nextArrowSpawn > 0)
             _nextArrowSpawn -= GetFrameTime();
         if (_playerInvicibility > 0)
             _playerInvicibility -= GetFrameTime();
+        
         if (_nextShopSpawn <= 0) {
             _nextShopSpawn = _spawnShopDelay;
         }
@@ -91,6 +119,15 @@ void TomatoSurvivor::loop() {
         update();
         checkCollisions();
         render();
+        if (IsKeyPressed(Config::KEY_PAUSE))
+            pause_menu();
+        if (_timer <= 0) {
+            still_alive = false;
+        }
+    }
+    
+    if (!WindowShouldClose()) {
+        death_menu();
     }
 }
 
