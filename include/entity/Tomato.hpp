@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AEntity.hpp"
+#include "Config.hpp"
 
 namespace TomatoSurvivor {
 
@@ -31,10 +32,10 @@ class Tomato : public AEntity {
   private:
     void input() {
         velocity = {0, 0};
-        if (IsKeyDown(KEY_RIGHT)) velocity.x = 2.0f;
-        if (IsKeyDown(KEY_LEFT)) velocity.x = -2.0f;
-        if (IsKeyDown(KEY_UP)) velocity.y = -2.0f;
-        if (IsKeyDown(KEY_DOWN)) velocity.y = 2.0f;
+        if (IsKeyDown(Config::KEY_RIGHT_MOVE)) velocity.x = 2.0f;
+        if (IsKeyDown(Config::KEY_LEFT_MOVE)) velocity.x = -2.0f;
+        if (IsKeyDown(Config::KEY_UP_MOVE)) velocity.y = -2.0f;
+        if (IsKeyDown(Config::KEY_DOWN_MOVE)) velocity.y = 2.0f;
     }
 };
 

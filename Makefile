@@ -9,11 +9,13 @@ SRC	=	$(addprefix src/, 		\
 			main.cpp			\
 			TomatoSurvivor.cpp	\
 			Menu.cpp 			\
+			Option.cpp 			\
+			Shop.cpp 			\
 		)
 
 OBJ	=	$(SRC:.cpp=.o)
 
-NAME	=	game-jam
+NAME	=	tomatoSurvivor
 
 CFLAGS	=	-Wall -Wextra
 
