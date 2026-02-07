@@ -24,6 +24,7 @@ void menu()
     Texture2D bg = LoadTexture("assets/background.jpg");
     bg.height = 900;
     bg.width = 800;
+    
     while (!WindowShouldClose() && !starting)
     {
         Vector2 mouse = GetMousePosition();
@@ -50,10 +51,11 @@ void menu()
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_shop)
             shop();
     }
-    ClearBackground(RAYWHITE);
-    if (!starting) {
-        SaveManager::writeSave();
-        CloseWindow();
-        exit(0);
-    }
+    
+    // Unload textures to avoid memory leaks
+    UnloadTexture(title);
+    UnloadTexture(button);
+    UnloadTexture(shop_tex);
+    UnloadTexture(bg);
+    UnloadImage(title_image);
 }

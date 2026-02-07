@@ -4,7 +4,6 @@
 #include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
 #include "TomatoSurvivor.hpp"
-#include "Death.hpp"
 #include "Pause.hpp"
 
 namespace TomatoSurvivor
@@ -23,10 +22,25 @@ TomatoSurvivor::TomatoSurvivor() {
     pan = 0.0f;
     SetMusicPan(music, pan);
     SetMusicVolume(music, volume);
+    still_alive = true;
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
     CloseWindow();
+}
+
+void TomatoSurvivor::reset() {
+    _arrows.clear();
+    _bonuses.clear();
+    _timer = 300.0;
+    _score = 0.0;
+    _nextArrowSpawn = _arrowSpawnDelay;
+    _nextShopSpawn = _spawnShopDelay;
+    _playerInvicibility = 0.0;
+    _tomato->setPosition({WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2});
+    spawnBonus();
+    still_alive = true;
+    return_to_menu = false;
 }
 
 void TomatoSurvivor::update() {
@@ -84,13 +98,14 @@ void TomatoSurvivor::render() {
 
 void TomatoSurvivor::loop() {
     PlayMusicStream(music);
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose() && still_alive) {
         _timer -= GetFrameTime();
         _nextShopSpawn -= GetFrameTime();
         if (_nextArrowSpawn > 0)
             _nextArrowSpawn -= GetFrameTime();
         if (_playerInvicibility > 0)
             _playerInvicibility -= GetFrameTime();
+        
         if (_nextShopSpawn <= 0) {
             _nextShopSpawn = _spawnShopDelay;
         }
@@ -103,8 +118,13 @@ void TomatoSurvivor::loop() {
         render();
         if (IsKeyPressed(Config::KEY_PAUSE))
             pause_menu();
-        if (IsKeyPressed(KEY_Y))
-            pause_menu();
+        if (_timer <= 0) {
+            still_alive = false;
+        }
+    }
+    
+    if (!WindowShouldClose()) {
+        death_menu();
     }
 }
 

@@ -1,1 +1,0 @@
-void death_menu();

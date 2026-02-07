@@ -21,6 +21,11 @@ class TomatoSurvivor {
     TomatoSurvivor();
     ~TomatoSurvivor();
     void loop();
+    void death_menu();
+    void reset();
+    float getScore() const { return _score; }
+    bool still_alive;
+    bool return_to_menu = false;
   private:
     void update();
     void render();
@@ -52,6 +57,6 @@ class TomatoSurvivor {
     float _nextShopSpawn = _spawnShopDelay;
     Music music;
     float volume;
-    float pan = 0.0f;
+    float pan = 0.0f; 
 };
 } // namespace TomatoSurvivor

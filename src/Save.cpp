@@ -69,4 +69,14 @@ void writeSave(const std::string &path)
     out << save.dump(4);
 }
 
+int getBestScore() {
+    return s_best_previous_score;
+}
+
+void updateBestScore(int score) {
+    if (score > s_best_previous_score) {
+        s_best_previous_score = score;
+    }
+}
+
 } // namespace SaveManager
