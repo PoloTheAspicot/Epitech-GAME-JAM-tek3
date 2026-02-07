@@ -16,6 +16,16 @@ TomatoSurvivor::TomatoSurvivor() {
     SetTargetFPS(60);
 
     _tomato = std::make_unique<Tomato>(_playerSize, WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
+    tomato_texture = LoadTexture("assets/tomato.png");
+    tomato_texture.height = _playerSize*2;
+    tomato_texture.width = _playerSize*2;
+    water_texture = LoadTexture("assets/water_bucket.png");
+    water_texture.height = _bonusSize*2;
+    water_texture.width = _bonusSize*2;
+    arrow_texture = LoadTexture("assets/arrow.png");
+    arrow_texture.height = _arrowSize*2;
+    arrow_texture.width = _arrowSize*2;
+    _tomato->setTexture(tomato_texture);
     spawnBonus();
     music = LoadMusicStream("assets/Tears.ogg");
     volume = 0.9f;
@@ -23,6 +33,7 @@ TomatoSurvivor::TomatoSurvivor() {
     SetMusicPan(music, pan);
     SetMusicVolume(music, volume);
     still_alive = true;
+    show_hitbox = false;
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
@@ -78,11 +89,11 @@ void TomatoSurvivor::render() {
     ClearBackground(RAYWHITE);
 
     if (_tomato)
-        _tomato->render();
+        _tomato->render(show_hitbox);
     for (auto &arrow : _arrows)
-        arrow->render();
+        arrow->render(show_hitbox);
     for (auto &bonus : _bonuses)
-        bonus->render();
+        bonus->render(show_hitbox);
     DrawRectangle(0, 0, 800, 100, LIGHTGRAY);
 
     DrawText(TextFormat(TEXT_TIME), 10, 10, 35, BLACK);
@@ -119,6 +130,12 @@ void TomatoSurvivor::loop() {
         render();
         if (IsKeyPressed(Config::KEY_PAUSE))
             pause_menu();
+        if (IsKeyPressed(KEY_LEFT_CONTROL)) {
+            if (!show_hitbox)
+                show_hitbox = 1;
+            else
+                show_hitbox = 0;
+        }
         if (_timer <= 0) {
             still_alive = false;
         }
@@ -183,11 +200,15 @@ void TomatoSurvivor::spawnArrow() {
         vel.y = rand() % 3 * (pos.y < 400 ? 1 : -1);
     }
     _arrows.emplace_back(std::make_unique<Arrow>(_arrowSize, pos, vel));
+    for (auto& arrow : _arrows)
+        arrow->setTexture(arrow_texture);
 }
 
 void TomatoSurvivor::spawnBonus() {
     _bonuses.emplace_back(std::make_unique<Bonus>(
         _bonusSize, (int)rand() % (int)GAME_SIZE.x, (int)rand() % (int)GAME_SIZE.y));
+    for (auto& bonus : _bonuses)
+        bonus->setTexture(water_texture);
 }
 
 } // namespace TomatoSurvivor

@@ -59,6 +59,10 @@ class TomatoSurvivor {
     float _nextShopSpawn = _spawnShopDelay;
     Music music;
     float volume;
-    float pan = 0.0f; 
+    float pan;
+    Texture2D tomato_texture;
+    Texture2D water_texture;
+    Texture2D arrow_texture;
+    bool show_hitbox;
 };
 } // namespace TomatoSurvivor

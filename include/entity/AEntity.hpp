@@ -10,9 +10,10 @@ class AEntity : public IEntity {
   public:
     virtual ~AEntity() = default;
     void update() = 0;
-
-    void render() override {
-        DrawCircleV({position.x, position.y + 100}, radius, color);
+    void render(bool show_hitbox) override {
+        DrawTexture(texture, position.x - radius, position.y + 100 - radius, WHITE);
+        if (show_hitbox)
+            DrawCircleV({position.x, position.y + 100}, radius, color);
     }
 
     Vector2 getPosition() const override {
@@ -21,6 +22,10 @@ class AEntity : public IEntity {
 
     void setPosition(Vector2 _position) override {
         position = _position;
+    }
+
+    void setTexture(Texture2D _texture) override {
+        texture = _texture;
     }
 
     int getRadius() const {
@@ -32,6 +37,7 @@ class AEntity : public IEntity {
     Vector2 velocity;
     Color color;
     int radius;
+    Texture2D texture;
 };
 
 } // namespace TomatoSurvivor
