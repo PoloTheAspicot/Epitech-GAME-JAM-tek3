@@ -43,6 +43,8 @@ void menu()
         DrawTexture(shop_tex, 800-128, 900-128, tint_shop);
         DrawText("PLAY", 340, 260, 40, tint);
         DrawText("OPTION", 320, 430, 40, tint_option);
+        DrawText(TextFormat("Highest Score: %d", SaveManager::getBestScore()), 200, 620, 40, DARKBLUE);
+        
         EndDrawing();
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover)
             starting = true;
@@ -52,7 +54,6 @@ void menu()
             shop();
     }
     
-    // Unload textures to avoid memory leaks
     UnloadTexture(title);
     UnloadTexture(button);
     UnloadTexture(shop_tex);

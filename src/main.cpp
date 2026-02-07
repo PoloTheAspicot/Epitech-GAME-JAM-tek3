@@ -10,15 +10,11 @@ int main(void)
     bool running = true;
     while (running && !WindowShouldClose()) {
         menu();
-        
         if (WindowShouldClose()) {
             break;
         }
-        
         game.reset();
         game.loop();
-        
-        // After game ends, if return_to_menu is true, loop back to menu
         if (!game.return_to_menu || WindowShouldClose()) {
             running = false;
         }

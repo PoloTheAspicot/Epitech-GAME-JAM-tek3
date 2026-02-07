@@ -41,6 +41,7 @@ void TomatoSurvivor::reset() {
     spawnBonus();
     still_alive = true;
     return_to_menu = false;
+    abandoned = false;
 }
 
 void TomatoSurvivor::update() {

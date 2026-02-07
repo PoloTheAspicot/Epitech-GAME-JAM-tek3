@@ -22,10 +22,12 @@ class TomatoSurvivor {
     ~TomatoSurvivor();
     void loop();
     void death_menu();
+    void pause_menu();
     void reset();
     float getScore() const { return _score; }
     bool still_alive;
     bool return_to_menu = false;
+    bool abandoned = false;
   private:
     void update();
     void render();
@@ -38,7 +40,7 @@ class TomatoSurvivor {
     std::unique_ptr<IEntity> _tomato;
     std::vector<std::unique_ptr<IEntity>> _arrows;
     std::vector<std::unique_ptr<IEntity>> _bonuses;
-    float _timer = 300.0;
+    float _timer;
     float _score = 0.0;
     float _playerSpeed = 2.0;
     float _playerSize = 50.0;
