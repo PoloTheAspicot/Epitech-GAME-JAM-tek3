@@ -1,11 +1,14 @@
 ##
 ## EPITECH PROJECT, 2025
-## gomoku
+## game-jam
 ## File description:
-## gomoku
+## game-jam
 ##
 
-SRC	=	src/main.cpp	\
+SRC	=	$(addprefix src/, 		\
+			main.cpp			\
+			TomatoSurvivor.cpp	\
+		)
 
 OBJ	=	$(SRC:.cpp=.o)
 
@@ -15,12 +18,12 @@ CFLAGS	=	-Wall -Wextra
 
 CPPFLAGS	=	-std=c++17 -I ./include
 
-++	?=	g++
+CXX	?=	g++
 
 all:	$(NAME)
 
 $(NAME):	$(OBJ)
-			$(++) -o $(NAME) $(OBJ) -lraylib
+			$(CXX) -o $(NAME) $(OBJ) -lraylib
 
 clean:
 			$(RM) $(OBJ)
