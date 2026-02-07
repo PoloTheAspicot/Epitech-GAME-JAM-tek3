@@ -9,7 +9,7 @@
 
 namespace TomatoSurvivor {
 
-static constexpr Vector2 WINDOW_SIZE = {800, 800};
+static constexpr Vector2 WINDOW_SIZE = {800, 900};
 
 class TomatoSurvivor {
   public:

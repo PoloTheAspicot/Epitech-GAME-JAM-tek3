@@ -8,6 +8,7 @@
 SRC	=	$(addprefix src/, 		\
 			main.cpp			\
 			TomatoSurvivor.cpp	\
+			Menu.cpp 			\
 		)
 
 OBJ	=	$(SRC:.cpp=.o)
