@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include "Config.hpp"
+#include "Save.hpp"
 
 const char* GetKeyName(int key) {
     switch (key) {
@@ -99,12 +100,16 @@ void option()
         DrawText("Press ENTER to save", 290, 500, 20, BLACK);
 
         EndDrawing();
-        if (IsKeyPressed(KEY_ENTER) && selecting == -1)
+        if (IsKeyPressed(KEY_ENTER) && selecting == -1) {
+            // persist keybinding changes when user confirms
+            SaveManager::writeSave();
             starting = true;
+        }
     }
     UnloadTexture(bg);
     ClearBackground(RAYWHITE);
     if (!starting) {
+        SaveManager::writeSave();
         CloseWindow();
         exit(0);
     }
