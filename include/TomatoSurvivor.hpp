@@ -30,5 +30,8 @@ class TomatoSurvivor {
     std::vector<std::unique_ptr<IEntity>> _bonuses;
     float _timer = 300;
     float _score = 0;
+    Music music;
+    float volume;
+    float pan = 0.0f;
 };
 } // namespace TomatoSurvivor

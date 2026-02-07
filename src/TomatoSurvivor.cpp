@@ -1,21 +1,28 @@
 #include <random>
 #include <algorithm>
-
 #include "entity/Tomato.hpp"
 #include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
 #include "TomatoSurvivor.hpp"
+#include "Death.hpp"
+#include "Pause.hpp"
 
 namespace TomatoSurvivor
 {
 
 TomatoSurvivor::TomatoSurvivor() {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Tomato Survivor");
+    InitAudioDevice();
     srand(time(0));
     SetTargetFPS(60);
 
     _tomato = std::make_unique<Tomato>(WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
     spawnBonus();
+    music = LoadMusicStream("assets/Tears.ogg");
+    volume = 0.9f;
+    pan = 0.0f;
+    SetMusicPan(music, pan);
+    SetMusicVolume(music, volume);
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
@@ -29,6 +36,7 @@ void TomatoSurvivor::update() {
         arrow->update();
     for (auto &bonus : _bonuses)
         bonus->update();
+    UpdateMusicStream(music);
 }
 
 void TomatoSurvivor::render() {
@@ -48,11 +56,16 @@ void TomatoSurvivor::render() {
 }
 
 void TomatoSurvivor::loop() {
+    PlayMusicStream(music);
     while (!WindowShouldClose()) {
         _timer -= GetFrameTime();
         update();
         checkCollisions();
         render();
+        if (IsKeyPressed(Config::KEY_PAUSE))
+            pause_menu();
+        if (IsKeyPressed(KEY_Y))
+            pause_menu();
     }
 }
 

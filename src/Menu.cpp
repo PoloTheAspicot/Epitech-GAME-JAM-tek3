@@ -3,6 +3,7 @@
 #include "Option.hpp"
 #include "Shop.hpp"
 #include "Save.hpp"
+#include "Menu.hpp"
 
 #define X_POS (800-371)/2
 
@@ -51,7 +52,6 @@ void menu()
     }
     ClearBackground(RAYWHITE);
     if (!starting) {
-        // write save before exiting
         SaveManager::writeSave();
         CloseWindow();
         exit(0);
