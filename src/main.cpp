@@ -1,8 +1,8 @@
 #include "TomatoSurvivor.hpp"
 
 int main(void) {
-    Tomato::TomatoSurvivor survivor;
+    TomatoSurvivor::TomatoSurvivor game;
 
-    survivor.loop();
+    game.loop();
     return 0;
 }
