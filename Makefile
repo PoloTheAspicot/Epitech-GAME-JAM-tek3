@@ -5,7 +5,7 @@
 ## gomoku
 ##
 
-SRC	=
+SRC	=	src/main.cpp	\
 
 OBJ	=	$(SRC:.cpp=.o)
 
@@ -20,7 +20,7 @@ CPPFLAGS	=	-std=c++17 -I ./include
 all:	$(NAME)
 
 $(NAME):	$(OBJ)
-			$(++) -o $(NAME) $(OBJ)
+			$(++) -o $(NAME) $(OBJ) -lraylib
 
 clean:
 			$(RM) $(OBJ)
