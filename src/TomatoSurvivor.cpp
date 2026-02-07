@@ -10,7 +10,7 @@ namespace TomatoSurvivor
 {
 
 TomatoSurvivor::TomatoSurvivor() {
-    InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "raylib [core] example - input keys");
+    InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Tomato Survivor");
     srand(time(0));
     SetTargetFPS(60);
     
