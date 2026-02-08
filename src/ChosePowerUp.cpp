@@ -7,19 +7,11 @@ void TomatoSurvivor::ChosePowerUp() {
     std::vector<int> indexes;
     int len = _allPowerUps.size();
     bool choice_made = false;
-    Rectangle ignore_button = {300, 600, 200, 100};
+    Rectangle ignore_button = {300, 650, 200, 100};
 
     for (int i = 0; i < 3; i++) {
-        // int randomIndex = rand() % len;
-        // for (int y = 0; y < indexes.size(); y++) {
-        //     if (indexes[y] == randomIndex) {
-        //         i--;
-        //         continue;
-        //     } else {
-        //         indexes.push_back(randomIndex);
-        //     }
-        // }
-        indexes.push_back(i);
+        int randomIndex = rand() % len;
+        indexes.push_back(randomIndex);
     }
     for (int i = 0; i < indexes.size(); i++) {
         randomPowerUps.push_back(_allPowerUps[i]);
@@ -39,7 +31,8 @@ void TomatoSurvivor::ChosePowerUp() {
                 choice_made = randomPowerUps[i].operate(_timer);
             }
         }
-        DrawRectangleRec(ignore_button, DARKBROWN);
+        DrawRectangleRec(ignore_button, RED);
+        DrawText(TextFormat("IGNORE OFFERS"), 310, 650, 25, WHITE);
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_ignore)
             choice_made = true;
         EndDrawing();
