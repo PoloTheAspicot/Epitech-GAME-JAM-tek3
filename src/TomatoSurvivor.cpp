@@ -28,6 +28,13 @@ void TomatoSurvivor::initializePowerUps() {
         "Become invincible for a sort period of time"));
 }
 
+float rotation_for_arrow(Vector2 vecteur)
+{
+    float angleRad = atan2(vecteur.y, vecteur.x);
+    float angleDeg = angleRad * RAD2DEG;
+    return (angleDeg + 45);
+}
+
 TomatoSurvivor::TomatoSurvivor() {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Tomato Survivor");
     InitAudioDevice();
@@ -41,9 +48,10 @@ TomatoSurvivor::TomatoSurvivor() {
     water_texture = LoadTexture("assets/water_bucket.png");
     water_texture.height = _bonusSize*2;
     water_texture.width = _bonusSize*2;
-    arrow_texture = LoadTexture("assets/arrow.png");
-    arrow_texture.height = _arrowSize*4;
-    arrow_texture.width = _arrowSize*4;
+    Image arrow_image = LoadImage("assets/arrow.png");
+    ImageRotate(&arrow_image, rotation_for_arrow({0, 0}));
+    ImageResize(&arrow_image, _arrowSize*3.2, _arrowSize*3.2);
+    arrow_texture = LoadTextureFromImage(arrow_image);
     _tomato->setTexture(tomato_texture);
     spawnBonus();
     music = LoadMusicStream("assets/Tears.ogg");
@@ -246,8 +254,13 @@ void TomatoSurvivor::spawnArrow() {
         vel.y = rand() % 3 * (pos.y < 400 ? 1 : -1);
     }
     _arrows.emplace_back(std::make_unique<Arrow>(_arrowSize, pos, vel));
-    for (auto& arrow : _arrows)
+    for (auto& arrow : _arrows) {
+        Image arrow_image = LoadImage("assets/arrow.png");
+        ImageRotate(&arrow_image, rotation_for_arrow(arrow->getVelocity()));
+        ImageResize(&arrow_image, arrow->getRadius()*3.2, arrow->getRadius()*3.2);
+        arrow_texture = LoadTextureFromImage(arrow_image);
         arrow->setTexture(arrow_texture);
+    }
 }
 
 void TomatoSurvivor::spawnBonus() {

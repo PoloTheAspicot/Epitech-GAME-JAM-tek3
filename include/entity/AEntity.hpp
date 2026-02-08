@@ -13,7 +13,7 @@ class AEntity : public IEntity {
     void render(bool show_hitbox) override {
         DrawTexture(texture, position.x - radius, position.y + 100 - radius, WHITE);
         if (show_hitbox)
-            DrawCircleV({position.x, position.y + 100}, radius, color);
+            DrawCircleV({position.x + offset.x, position.y + 100 + offset.y}, radius, color);
     }
 
     Vector2 getPosition() const override {
@@ -36,13 +36,18 @@ class AEntity : public IEntity {
         return radius;
     }
 
+    Vector2 getVelocity() const override {
+        return velocity;
+    }
+
   protected:
     float speed;
     Vector2 position;
     Vector2 velocity;
+    Vector2 offset;
     Color color;
     int radius;
-    Texture2D texture;
+    Texture2D texture;  
 };
 
 } // namespace TomatoSurvivor
