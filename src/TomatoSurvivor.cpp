@@ -153,6 +153,16 @@ void TomatoSurvivor::loop() {
         
         if (_nextShopSpawn <= 0) {
             _nextShopSpawn = _spawnShopDelay;
+            /*
+            Ajouter une fonction qui fait :
+            - met le jeu en pause (obv)
+            - choisit 3 powerup differents aléatoirement
+            - les displays côte à côte avec leur fonction render(?) (-> à faire mais ez juste la description et le cost)
+            - display un bouton "ignore choices"
+            - quand le joueur clique sur un powerup, appeler PowerUp->operate, true si c bon et false s'il peut pas payer
+            - et voilà on quitte et on revient au jeu
+            - après avoir appeler operate, appeler _tomato->setSpeed(_playerSpeed); c important
+            */
         }
         if (_nextArrowSpawn <= 0 && _arrows.size() < _maxNumberArrows) {
             _nextArrowSpawn = _arrowSpawnDelay;
