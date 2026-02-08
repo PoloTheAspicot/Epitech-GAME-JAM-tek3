@@ -17,18 +17,19 @@ class PowerUp {
         MUL,
     };
     PowerUp(float _cost, float *ref, float _value,
-        OPERATION op, std::string descr);
+        OPERATION op, const char *descr);
     ~PowerUp() = default;
 
+    bool canBuy(float &timer) const;
     bool operate(float &timer) const;
-    void render() const;
+    bool render(float &timer, float offset, Vector2 mouse) const;
 
   private:
     float cost;
     float *param;
     float value;
     OPERATION operation;
-    std::string description;
+    const char *description;
 };
 
 } // namespace TomatoSurvivor

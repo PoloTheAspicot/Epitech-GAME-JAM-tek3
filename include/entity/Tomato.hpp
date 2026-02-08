@@ -10,6 +10,7 @@ class Tomato : public AEntity {
     Tomato(float s, float r, float x, float y, float vx = 0, float vy = 0) {
         position = {x, y};
         velocity = {vx, vy};
+        offset = {0, 0};
         color = RED;
         radius = r;
         speed = s;

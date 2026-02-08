@@ -9,6 +9,7 @@
 #include "entity/Damage.hpp"
 #include "entity/Heal.hpp"
 #include "TomatoSurvivor.hpp"
+#include "AudioManager.hpp"
 #include "Pause.hpp"
 
 namespace TomatoSurvivor
@@ -30,19 +31,26 @@ static Vector2 getCollisionCircles(const Vector2 &pos1, float radius1, const Vec
 
 void TomatoSurvivor::initializePowerUps() {
     _allPowerUps.push_back(PowerUp(80.0, &_bonusTimeGain, 10.0, PowerUp::OPERATION::ADD,
-        "Bonuses grant you more seconds"));
+        "Bonuses\ngrant you\nmore seconds\n"));
     _allPowerUps.push_back(PowerUp(50.0, &_bonusScore, 1.5, PowerUp::OPERATION::MUL,
-        "Bonuses grant you half more score"));
+        "Bonuses\ngrant you\nhalf more\n score"));
     _allPowerUps.push_back(PowerUp(50.0, &_playerSpeed, 1.5, PowerUp::OPERATION::ADD,
-        "Grants you faster movements"));
+        "Grants\nyou faster\nmovements"));
     _allPowerUps.push_back(PowerUp(30.0, &_arrowSpeed, 1.2, PowerUp::OPERATION::DIV,
-        "Arrows move slower"));
+        "Arrows\nmove slower"));
     _allPowerUps.push_back(PowerUp(100.0, &_arrowDamage, 1.5, PowerUp::OPERATION::DIV,
-        "Arrows deal less damage to you"));
+        "Arrows\ndeal less\ndamage to\nyou"));
     _allPowerUps.push_back(PowerUp(80.0, &_maxNumberArrows, 1.0, PowerUp::OPERATION::SUB,
-        "Less arrows will spawn"));
+        "Less\narrows will\nspawn"));
     _allPowerUps.push_back(PowerUp(150.0, &_playerInvincibility, 10.0, PowerUp::OPERATION::ADD,
-        "Become invincible for a sort period of time"));
+        "Become\n invincible for\n a short\n period of time"));
+}
+
+float rotation_for_arrow(Vector2 vecteur)
+{
+    float angleRad = atan2(vecteur.y, vecteur.x);
+    float angleDeg = angleRad * RAD2DEG;
+    return (angleDeg + 45);
 }
 
 TomatoSurvivor::TomatoSurvivor() {
@@ -56,11 +64,12 @@ TomatoSurvivor::TomatoSurvivor() {
     tomato_texture.height = _playerSize * 2;
     tomato_texture.width = _playerSize * 2;
     water_texture = LoadTexture("assets/water_bucket.png");
-    water_texture.height = _bonusSize * 2;
-    water_texture.width = _bonusSize * 2;
-    arrow_texture = LoadTexture("assets/arrow.png");
-    arrow_texture.height = _arrowSize * 4;
-    arrow_texture.width = _arrowSize * 4;
+    water_texture.height = _bonusSize*2;
+    water_texture.width = _bonusSize*2;
+    Image arrow_image = LoadImage("assets/arrow.png");
+    ImageRotate(&arrow_image, rotation_for_arrow({0, 0}));
+    ImageResize(&arrow_image, _arrowSize*3.2, _arrowSize*3.2);
+    arrow_texture = LoadTextureFromImage(arrow_image);
     _tomato->setTexture(tomato_texture);
     spawnBonus();
     damage_texture = LoadTexture("assets/damage.png");
@@ -70,17 +79,19 @@ TomatoSurvivor::TomatoSurvivor() {
     heal_texture.height = HEAL_SIZE * 2;
     heal_texture.width = HEAL_SIZE * 2;
     music = LoadMusicStream("assets/Tears.ogg");
-    volume = 0.9f;
+    volume = 0.6f;
     pan = 0.0f;
     SetMusicPan(music, pan);
     SetMusicVolume(music, volume);
     still_alive = true;
     show_hitbox = false;
     initializePowerUps();
+    AudioManager::init();
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
     CloseWindow();
+    AudioManager::unload();
 }
 
 void TomatoSurvivor::reset() {
@@ -152,7 +163,7 @@ void TomatoSurvivor::update() {
 
 void TomatoSurvivor::render() {
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(ORANGE);
 
     if (_tomato)
         _tomato->render(show_hitbox);
@@ -162,16 +173,20 @@ void TomatoSurvivor::render() {
         bonus->render(show_hitbox);
     for (auto &particle : _particles)
         particle.first->render(show_hitbox);
-    DrawRectangle(0, 0, 800, 100, LIGHTGRAY);
+    DrawRectangle(0, 0, 800, 100, BLUE);
 
-    DrawText(TextFormat(TEXT_TIME), 10, 10, 35, BLACK);
+    DrawText(TextFormat(TEXT_TIME), 10, 10, 35, WHITE);
     DrawText(TextFormat("%.1f", _timer), 10 + TextLength(TEXT_TIME) * 20, 10, 35, RED);
-    DrawText(TextFormat(TEXT_SCORE), 10, 55, 35, BLACK);
+    DrawText(TextFormat("%.1f", _timer), 10 + 2 + TextLength(TEXT_TIME) * 20, 10 + 2, 35, WHITE);
+    DrawText(TextFormat(TEXT_SCORE), 10, 55, 35, WHITE);
     DrawText(TextFormat("%.0f", _score), 10 + TextLength(TEXT_SCORE) * 20, 55, 35, RED);
-    DrawText(TextFormat(TEXT_SHOP), 350, 10, 35, BLACK);
+    DrawText(TextFormat("%.0f", _score), 10 + 2 + TextLength(TEXT_SCORE) * 20, 55 + 2, 35, WHITE);
+    DrawText(TextFormat(TEXT_SHOP), 350, 10, 35, WHITE);
     DrawText(TextFormat("%.1f", _nextShopSpawn), 350 + TextLength(TEXT_SHOP) * 20, 10, 35, RED);
-    DrawText(TextFormat(TEXT_ARROW), 350, 55, 35, BLACK);
+    DrawText(TextFormat("%.1f", _nextShopSpawn), 350 + 2 + TextLength(TEXT_SHOP) * 20, 10 + 2, 35, WHITE);
+    DrawText(TextFormat(TEXT_ARROW), 350, 55, 35, WHITE);
     DrawText(TextFormat("%.1f", std::abs(_nextArrowSpawn)), 350 + TextLength(TEXT_ARROW) * 20, 55, 35, RED);
+    DrawText(TextFormat("%.1f", std::abs(_nextArrowSpawn)), 350 + 2+ TextLength(TEXT_ARROW) * 20, 55 + 2, 35, WHITE);
 
     EndDrawing();
 }
@@ -185,19 +200,9 @@ void TomatoSurvivor::loop() {
             _nextArrowSpawn -= GetFrameTime();
         if (_playerInvincibility > 0)
             _playerInvincibility -= GetFrameTime();
-
         if (_nextShopSpawn <= 0) {
             _nextShopSpawn = _spawnShopDelay;
-            /*
-            Ajouter une fonction qui fait :
-            - met le jeu en pause (obv)
-            - choisit 3 powerup differents aléatoirement
-            - les displays côte à côte avec leur fonction render(?) (-> à faire mais ez juste la description et le cost)
-            - display un bouton "ignore choices"
-            - quand le joueur clique sur un powerup, appeler PowerUp->operate, true si c bon et false s'il peut pas payer
-            - et voilà on quitte et on revient au jeu
-            - après avoir appeler operate, appeler _tomato->setSpeed(_playerSpeed); c important
-            */
+            ChosePowerUp();
         }
         if (_nextArrowSpawn <= 0 && _arrows.size() < _maxNumberArrows) {
             _nextArrowSpawn = _arrowSpawnDelay;
@@ -242,6 +247,7 @@ void TomatoSurvivor::checkCollisionsArrows() {
             _particles.emplace_back(std::make_pair(std::make_unique<Damage>(DAMAGE_SIZE, pos.x, pos.y), 0));
             _particles.back().first->setTexture(damage_texture);
             _timer -= _arrowDamage;
+            AudioManager::playDamage();
             _playerInvincibility = _invincibilityTime;
         }
     }
@@ -260,6 +266,7 @@ void TomatoSurvivor::checkCollisionsBonuses() {
                 _next_DifficultyLevel += DIFFICULTY_INC;
             }
             _bonuses.erase(std::remove(_bonuses.begin(), _bonuses.end(), bonus), _bonuses.end());
+            AudioManager::playBonus();
             spawnBonus();
         }
     }
@@ -287,8 +294,13 @@ void TomatoSurvivor::spawnArrow() {
         vel.y = rand() % 3 * (pos.y < 400 ? 1 : -1);
     }
     _arrows.emplace_back(std::make_unique<Arrow>(_arrowSize, pos, vel));
-    for (auto& arrow : _arrows)
+    for (auto& arrow : _arrows) {
+        Image arrow_image = LoadImage("assets/arrow.png");
+        ImageRotate(&arrow_image, rotation_for_arrow(arrow->getVelocity()));
+        ImageResize(&arrow_image, arrow->getRadius()*3.2, arrow->getRadius()*3.2);
+        arrow_texture = LoadTextureFromImage(arrow_image);
         arrow->setTexture(arrow_texture);
+    }
 }
 
 void TomatoSurvivor::spawnBonus() {
@@ -300,9 +312,9 @@ void TomatoSurvivor::spawnBonus() {
 
 void TomatoSurvivor::increaseDifficulty() {
     _arrowSpeed *= 1.25;
-    _arrowSize *= 1.5;
+    _arrowSize *= 1.25;
     _arrowDamage += 10.0;
-    _arrowSpawnDelay *= 0.75;
+    _arrowSpawnDelay *= 0.5;
     _maxNumberArrows += 1.0;
 }
 

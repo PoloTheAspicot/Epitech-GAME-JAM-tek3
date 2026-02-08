@@ -8,6 +8,7 @@ class Bonus : public AEntity {
     Bonus(float r, float x, float y, float vx = 0, float vy = 0) {
         position = {x, y};
         velocity = {vx, vy};
+        offset = {0, 0};
         color = GREEN;
         radius = r;
     }

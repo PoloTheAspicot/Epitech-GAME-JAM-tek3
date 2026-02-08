@@ -3,6 +3,7 @@
 #include <string>
 #include "Config.hpp"
 #include "Save.hpp"
+#include "AudioManager.hpp"
 
 const char* GetKeyName(int key) {
     switch (key) {
@@ -84,6 +85,7 @@ void option()
                 else if (CheckCollisionPointRec(mouse, rectRight)) selecting = 3;
                 else if (CheckCollisionPointRec(mouse, rectPause)) selecting = 4;
                 else selecting = -1;
+                if (selecting != -1) AudioManager::playClick();
         }
 
         BeginDrawing();
@@ -106,6 +108,7 @@ void option()
 
         EndDrawing();
         if (IsKeyPressed(KEY_ENTER) && selecting == -1) {
+            AudioManager::playClick();
             SaveManager::writeSave();
             starting = true;
         }
