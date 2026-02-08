@@ -75,7 +75,7 @@ TomatoSurvivor::TomatoSurvivor() {
     damage_texture = LoadTexture("assets/damage.png");
     damage_texture.height = DAMAGE_SIZE * 2;
     damage_texture.width = DAMAGE_SIZE * 2;
-    heal_texture = LoadTexture("assets/happy.png");
+    heal_texture = LoadTexture("assets/happy_particle.png");
     heal_texture.height = HEAL_SIZE * 2;
     heal_texture.width = HEAL_SIZE * 2;
     music = LoadMusicStream("assets/Tears.ogg");
@@ -151,11 +151,11 @@ void TomatoSurvivor::update() {
     for (auto &bonus : _bonuses)
         bonus->update();
 
-    for (auto &particle : _particles) {
-        particle.first->update();
-        particle.second += 1;
-        if (particle.second > PARTICLE_LIFETIME)
-            _particles.erase(std::remove(_particles.begin(), _particles.end(), particle), _particles.end());
+    for (size_t i = 0; i < _particles.size(); i++) {
+        _particles[i].first->update();
+        _particles[i].second += 1;
+        if (_particles[i].second > PARTICLE_LIFETIME)
+            _particles.erase(std::remove(_particles.begin(), _particles.end(), _particles[i]), _particles.end());
     }
 
     UpdateMusicStream(music);
@@ -259,7 +259,8 @@ void TomatoSurvivor::checkCollisionsBonuses() {
             bonus->getPosition(), bonus->getRadius())) {
             _timer += 10;
             _score += 100;
-            _particles.emplace_back(std::make_pair(std::make_unique<Heal>(HEAL_SIZE, bonus->getPosition().x, bonus->getPosition().y), 0));
+            Vector2 pos = bonus->getPosition();
+            _particles.emplace_back(std::make_pair(std::make_unique<Heal>(HEAL_SIZE, pos.x, pos.y), 0));
             _particles.back().first->setTexture(heal_texture);
             if (_score >= _next_DifficultyLevel) {
                 increaseDifficulty();

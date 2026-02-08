@@ -18,8 +18,8 @@ static constexpr auto TEXT_SCORE = "Score: ";
 static constexpr auto TEXT_SHOP = "Next shop: ";
 static constexpr auto TEXT_ARROW = "Next arrow: ";
 static constexpr float DIFFICULTY_INC = 800;
-static constexpr float DAMAGE_SIZE = 20.0f;
-static constexpr float HEAL_SIZE = 20.0f;
+static constexpr int DAMAGE_SIZE = 20;
+static constexpr int HEAL_SIZE = 20;
 static constexpr int PARTICLE_LIFETIME = 40;
 
 class TomatoSurvivor {
