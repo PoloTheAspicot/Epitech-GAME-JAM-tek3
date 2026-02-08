@@ -14,19 +14,19 @@ namespace TomatoSurvivor
 
 void TomatoSurvivor::initializePowerUps() {
     _allPowerUps.push_back(PowerUp(80.0, &_bonusTimeGain, 10.0, PowerUp::OPERATION::ADD,
-        "Bonuses grant you more seconds"));
+        "Bonuses\ngrant you\nmore seconds\n"));
     _allPowerUps.push_back(PowerUp(50.0, &_bonusScore, 1.5, PowerUp::OPERATION::MUL,
-        "Bonuses grant you half more score"));
+        "Bonuses\ngrant you\nhalf more\n score"));
     _allPowerUps.push_back(PowerUp(50.0, &_playerSpeed, 1.5, PowerUp::OPERATION::ADD,
-        "Grants you faster movements"));
+        "Grants\nyou faster\nmovements"));
     _allPowerUps.push_back(PowerUp(30.0, &_arrowSpeed, 1.2, PowerUp::OPERATION::DIV,
-        "Arrows move slower"));
+        "Arrows\nmove slower"));
     _allPowerUps.push_back(PowerUp(100.0, &_arrowDamage, 1.5, PowerUp::OPERATION::DIV,
-        "Arrows deal less damage to you"));
+        "Arrows\ndeal less\ndamage to\nyou"));
     _allPowerUps.push_back(PowerUp(80.0, &_maxNumberArrows, 1.0, PowerUp::OPERATION::SUB,
-        "Less arrows will spawn"));
+        "Less\narrows will\nspawn"));
     _allPowerUps.push_back(PowerUp(150.0, &_playerInvincibility, 10.0, PowerUp::OPERATION::ADD,
-        "Become invincible for a sort period of time"));
+        "Become\n invincible for\n a short\n period of time"));
 }
 
 float rotation_for_arrow(Vector2 vecteur)
@@ -130,7 +130,7 @@ void TomatoSurvivor::update() {
 
 void TomatoSurvivor::render() {
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(ORANGE);
 
     if (_tomato)
         _tomato->render(show_hitbox);
@@ -138,16 +138,20 @@ void TomatoSurvivor::render() {
         arrow->render(show_hitbox);
     for (auto &bonus : _bonuses)
         bonus->render(show_hitbox);
-    DrawRectangle(0, 0, 800, 100, LIGHTGRAY);
+    DrawRectangle(0, 0, 800, 100, BLUE);
 
-    DrawText(TextFormat(TEXT_TIME), 10, 10, 35, BLACK);
+    DrawText(TextFormat(TEXT_TIME), 10, 10, 35, WHITE);
     DrawText(TextFormat("%.1f", _timer), 10 + TextLength(TEXT_TIME) * 20, 10, 35, RED);
-    DrawText(TextFormat(TEXT_SCORE), 10, 55, 35, BLACK);
+    DrawText(TextFormat("%.1f", _timer), 10 + 2 + TextLength(TEXT_TIME) * 20, 10 + 2, 35, WHITE);
+    DrawText(TextFormat(TEXT_SCORE), 10, 55, 35, WHITE);
     DrawText(TextFormat("%.0f", _score), 10 + TextLength(TEXT_SCORE) * 20, 55, 35, RED);
-    DrawText(TextFormat(TEXT_SHOP), 350, 10, 35, BLACK);
+    DrawText(TextFormat("%.0f", _score), 10 + 2 + TextLength(TEXT_SCORE) * 20, 55 + 2, 35, WHITE);
+    DrawText(TextFormat(TEXT_SHOP), 350, 10, 35, WHITE);
     DrawText(TextFormat("%.1f", _nextShopSpawn), 350 + TextLength(TEXT_SHOP) * 20, 10, 35, RED);
-    DrawText(TextFormat(TEXT_ARROW), 350, 55, 35, BLACK);
+    DrawText(TextFormat("%.1f", _nextShopSpawn), 350 + 2 + TextLength(TEXT_SHOP) * 20, 10 + 2, 35, WHITE);
+    DrawText(TextFormat(TEXT_ARROW), 350, 55, 35, WHITE);
     DrawText(TextFormat("%.1f", std::abs(_nextArrowSpawn)), 350 + TextLength(TEXT_ARROW) * 20, 55, 35, RED);
+    DrawText(TextFormat("%.1f", std::abs(_nextArrowSpawn)), 350 + 2+ TextLength(TEXT_ARROW) * 20, 55 + 2, 35, WHITE);
 
     EndDrawing();
 }
@@ -161,19 +165,9 @@ void TomatoSurvivor::loop() {
             _nextArrowSpawn -= GetFrameTime();
         if (_playerInvincibility > 0)
             _playerInvincibility -= GetFrameTime();
-        
         if (_nextShopSpawn <= 0) {
             _nextShopSpawn = _spawnShopDelay;
-            /*
-            Ajouter une fonction qui fait :
-            - met le jeu en pause (obv)
-            - choisit 3 powerup differents aléatoirement
-            - les displays côte à côte avec leur fonction render(?) (-> à faire mais ez juste la description et le cost)
-            - display un bouton "ignore choices"
-            - quand le joueur clique sur un powerup, appeler PowerUp->operate, true si c bon et false s'il peut pas payer
-            - et voilà on quitte et on revient au jeu
-            - après avoir appeler operate, appeler _tomato->setSpeed(_playerSpeed); c important
-            */
+            ChosePowerUp();
         }
         if (_nextArrowSpawn <= 0 && _arrows.size() < _maxNumberArrows) {
             _nextArrowSpawn = _arrowSpawnDelay;
@@ -277,9 +271,9 @@ void TomatoSurvivor::spawnBonus() {
 
 void TomatoSurvivor::increaseDifficulty() {
     _arrowSpeed *= 1.25;
-    _arrowSize *= 1.5;
+    _arrowSize *= 1.25;
     _arrowDamage += 10.0;
-    _arrowSpawnDelay *= 0.75;
+    _arrowSpawnDelay *= 0.5;
     _maxNumberArrows += 1.0;
 }
 
