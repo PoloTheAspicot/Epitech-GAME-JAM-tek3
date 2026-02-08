@@ -20,6 +20,10 @@ class AEntity : public IEntity {
         return position;
     }
 
+    void setSpeed(float _speed) override {
+        speed = _speed;
+    }
+
     void setPosition(Vector2 _position) override {
         position = _position;
     }
@@ -28,11 +32,12 @@ class AEntity : public IEntity {
         texture = _texture;
     }
 
-    int getRadius() const {
+    int getRadius() const override {
         return radius;
     }
 
   protected:
+    float speed;
     Vector2 position;
     Vector2 velocity;
     Color color;

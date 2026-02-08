@@ -11,13 +11,30 @@
 namespace TomatoSurvivor
 {
 
+void TomatoSurvivor::initializePowerUps() {
+    _allPowerUps.push_back(PowerUp(80.0, &_bonusTimeGain, 10.0, PowerUp::OPERATION::ADD,
+        "Bonuses grant you more seconds"));
+    _allPowerUps.push_back(PowerUp(50.0, &_bonusScore, 1.5, PowerUp::OPERATION::MUL,
+        "Bonuses grant you half more score"));
+    _allPowerUps.push_back(PowerUp(50.0, &_playerSpeed, 1.5, PowerUp::OPERATION::ADD,
+        "Grants you faster movements"));
+    _allPowerUps.push_back(PowerUp(30.0, &_arrowSpeed, 1.2, PowerUp::OPERATION::DIV,
+        "Arrows move slower"));
+    _allPowerUps.push_back(PowerUp(100.0, &_arrowDamage, 1.5, PowerUp::OPERATION::DIV,
+        "Arrows deal less damage to you"));
+    _allPowerUps.push_back(PowerUp(80.0, &_maxNumberArrows, 1.0, PowerUp::OPERATION::SUB,
+        "Less arrows will spawn"));
+    _allPowerUps.push_back(PowerUp(150.0, &_playerInvincibility, 10.0, PowerUp::OPERATION::ADD,
+        "Become invincible for a sort period of time"));
+}
+
 TomatoSurvivor::TomatoSurvivor() {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Tomato Survivor");
     InitAudioDevice();
     srand(time(0));
     SetTargetFPS(60);
 
-    _tomato = std::make_unique<Tomato>(_playerSize, WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2);
+    _tomato = std::make_unique<Tomato>(_playerSpeed, _playerSize, WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2, _playerSpeed);
     tomato_texture = LoadTexture("assets/tomato.png");
     tomato_texture.height = _playerSize*2;
     tomato_texture.width = _playerSize*2;
@@ -36,6 +53,7 @@ TomatoSurvivor::TomatoSurvivor() {
     SetMusicVolume(music, volume);
     still_alive = true;
     show_hitbox = false;
+    initializePowerUps();
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
@@ -45,11 +63,24 @@ TomatoSurvivor::~TomatoSurvivor() {
 void TomatoSurvivor::reset() {
     _arrows.clear();
     _bonuses.clear();
-    _timer = 300.0;
+    _timer = 300;
     _score = 0.0;
+    _playerSpeed = 3.0;
+    _playerSize = 50.0;
+    _arrowSpeed = 2.0;
+    _arrowSize = 10.0;
+    _arrowDamage = 20.0;
+    _arrowSpawnDelay = 2.0;
+    _maxNumberArrows = 3.0;
     _nextArrowSpawn = _arrowSpawnDelay;
+    _bonusSize = 30.0;
+    _bonusTimeGain = 10.0;
+    _bonusScore = 100.0;
+    _invincibilityTime = 0.5;
+    _playerInvincibility = 0.0;
+    _spawnShopDelay = 20.0;
     _nextShopSpawn = _spawnShopDelay;
-    _playerInvicibility = 0.0;
+    _next_DifficultyLevel = DIFFICULTY_INC;
     _tomato->setPosition({WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2});
     spawnBonus();
     still_alive = true;
@@ -117,8 +148,8 @@ void TomatoSurvivor::loop() {
         _nextShopSpawn -= GetFrameTime();
         if (_nextArrowSpawn > 0)
             _nextArrowSpawn -= GetFrameTime();
-        if (_playerInvicibility > 0)
-            _playerInvicibility -= GetFrameTime();
+        if (_playerInvincibility > 0)
+            _playerInvincibility -= GetFrameTime();
         
         if (_nextShopSpawn <= 0) {
             _nextShopSpawn = _spawnShopDelay;
@@ -154,16 +185,15 @@ void TomatoSurvivor::checkCollisions() {
 }
 
 void TomatoSurvivor::checkCollisionsArrows() {
-    if (_playerInvicibility > 0)
+    if (_playerInvincibility > 0)
         return;
     for (unsigned int i = 0; i < _arrows.size(); i++) {
         auto &arrow = _arrows[i];
-        arrow->update();
         if (CheckCollisionCircles(_tomato->getPosition(), _tomato->getRadius(),
             arrow->getPosition(), arrow->getRadius())) {
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
             _timer -= _arrowDamage;
-            _playerInvicibility = _invicibilityTime;
+            _playerInvincibility = _invincibilityTime;
         }
     }
 }
@@ -218,10 +248,10 @@ void TomatoSurvivor::spawnBonus() {
 }
 
 void TomatoSurvivor::increaseDifficulty() {
-    _arrowSpeed *= 1.2;
-    _arrowSize += 1.0;
-    _arrowDamage *= 1.5;
-    _arrowSpawnDelay *= 0.8;
+    _arrowSpeed *= 1.25;
+    _arrowSize *= 1.5;
+    _arrowDamage += 10.0;
+    _arrowSpawnDelay *= 0.75;
     _maxNumberArrows += 1.0;
 }
 
