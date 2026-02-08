@@ -6,6 +6,7 @@
 #include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
 #include "TomatoSurvivor.hpp"
+#include "AudioManager.hpp"
 #include "Pause.hpp"
 
 namespace TomatoSurvivor
@@ -28,6 +29,13 @@ void TomatoSurvivor::initializePowerUps() {
         "Become\n invincible for\n a short\n period of time"));
 }
 
+float rotation_for_arrow(Vector2 vecteur)
+{
+    float angleRad = atan2(vecteur.y, vecteur.x);
+    float angleDeg = angleRad * RAD2DEG;
+    return (angleDeg + 45);
+}
+
 TomatoSurvivor::TomatoSurvivor() {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Tomato Survivor");
     InitAudioDevice();
@@ -41,23 +49,26 @@ TomatoSurvivor::TomatoSurvivor() {
     water_texture = LoadTexture("assets/water_bucket.png");
     water_texture.height = _bonusSize*2;
     water_texture.width = _bonusSize*2;
-    arrow_texture = LoadTexture("assets/arrow.png");
-    arrow_texture.height = _arrowSize*4;
-    arrow_texture.width = _arrowSize*4;
+    Image arrow_image = LoadImage("assets/arrow.png");
+    ImageRotate(&arrow_image, rotation_for_arrow({0, 0}));
+    ImageResize(&arrow_image, _arrowSize*3.2, _arrowSize*3.2);
+    arrow_texture = LoadTextureFromImage(arrow_image);
     _tomato->setTexture(tomato_texture);
     spawnBonus();
     music = LoadMusicStream("assets/Tears.ogg");
-    volume = 0.9f;
+    volume = 0.6f;
     pan = 0.0f;
     SetMusicPan(music, pan);
     SetMusicVolume(music, volume);
     still_alive = true;
     show_hitbox = false;
     initializePowerUps();
+    AudioManager::init();
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
     CloseWindow();
+    AudioManager::unload();
 }
 
 void TomatoSurvivor::reset() {
@@ -197,6 +208,7 @@ void TomatoSurvivor::checkCollisionsArrows() {
             arrow->getPosition(), arrow->getRadius())) {
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
             _timer -= _arrowDamage;
+            AudioManager::playDamage();
             _playerInvincibility = _invincibilityTime;
         }
     }
@@ -213,6 +225,7 @@ void TomatoSurvivor::checkCollisionsBonuses() {
                 _next_DifficultyLevel += DIFFICULTY_INC;
             }
             _bonuses.erase(std::remove(_bonuses.begin(), _bonuses.end(), bonus), _bonuses.end());
+            AudioManager::playBonus();
             spawnBonus();
         }
     }
@@ -240,8 +253,13 @@ void TomatoSurvivor::spawnArrow() {
         vel.y = rand() % 3 * (pos.y < 400 ? 1 : -1);
     }
     _arrows.emplace_back(std::make_unique<Arrow>(_arrowSize, pos, vel));
-    for (auto& arrow : _arrows)
+    for (auto& arrow : _arrows) {
+        Image arrow_image = LoadImage("assets/arrow.png");
+        ImageRotate(&arrow_image, rotation_for_arrow(arrow->getVelocity()));
+        ImageResize(&arrow_image, arrow->getRadius()*3.2, arrow->getRadius()*3.2);
+        arrow_texture = LoadTextureFromImage(arrow_image);
         arrow->setTexture(arrow_texture);
+    }
 }
 
 void TomatoSurvivor::spawnBonus() {

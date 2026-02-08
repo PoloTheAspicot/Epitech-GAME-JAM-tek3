@@ -15,7 +15,11 @@ SRC	=	$(addprefix src/, 		\
 			Death.cpp 			\
 			Pause.cpp 			\
 			PowerUps.cpp		\
+<<<<<<< HEAD
 			ChosePowerUp.cpp	\
+=======
+			AudioManager.cpp	\
+>>>>>>> 129c679cc28d42b169ad1a8254c410530476214a
 		)
 
 OBJ	=	$(SRC:.cpp=.o)

@@ -12,6 +12,7 @@ class IEntity {
     virtual void setPosition(Vector2) = 0;
     virtual void setTexture(Texture2D) = 0;
     virtual int getRadius() const = 0;
+    virtual Vector2 getVelocity() const = 0;
 };
 
 } // namespace TomatoSurvivor

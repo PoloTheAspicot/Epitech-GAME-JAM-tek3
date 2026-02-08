@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "TomatoSurvivor.hpp"
 #include "Save.hpp"
+#include "AudioManager.hpp"
 
 namespace TomatoSurvivor {
 
@@ -30,6 +31,7 @@ void TomatoSurvivor::death_menu()
         EndDrawing();
         
         if (IsKeyPressed(KEY_ENTER)) {
+            AudioManager::playClick();
             waiting_for_input = false;
             return_to_menu = true;
         }
