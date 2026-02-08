@@ -39,3 +39,8 @@
 
 # debug information files
 *.dwo
+
+#specifics
+*.vscode
+tomatoSurvivor
+*.json
