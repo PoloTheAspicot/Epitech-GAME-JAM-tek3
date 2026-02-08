@@ -9,7 +9,9 @@ namespace TomatoSurvivor {
 class AEntity : public IEntity {
   public:
     virtual ~AEntity() = default;
-    void update() = 0;
+
+    virtual void update() = 0;
+
     void render(bool show_hitbox) override {
         DrawTexture(texture, position.x - radius, position.y + 100 - radius, WHITE);
         if (show_hitbox)
