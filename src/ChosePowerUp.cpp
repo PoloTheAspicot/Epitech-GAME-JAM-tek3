@@ -32,7 +32,7 @@ void TomatoSurvivor::ChosePowerUp() {
             }
         }
         DrawRectangleRec(ignore_button, RED);
-        DrawText(TextFormat("IGNORE OFFERS"), 310, 650, 25, WHITE);
+        DrawText(TextFormat("IGNORE OFFERS"), 310, 650, 20, WHITE);
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_ignore)
             choice_made = true;
         EndDrawing();
