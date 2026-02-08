@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <cstdlib>
 #include "TomatoSurvivor.hpp"
+#include "AudioManager.hpp"
 
 namespace TomatoSurvivor {
 
@@ -31,9 +32,11 @@ void TomatoSurvivor::pause_menu()
         DrawText("ABANDON", 330, 505, 30, WHITE);
         EndDrawing();
         if (IsKeyPressed(KEY_ENTER) || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_resume)) {
+            AudioManager::playClick();
             returning = true;
         }
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_abandon) {
+            AudioManager::playClick();
             abandoning = true;
         }
     }

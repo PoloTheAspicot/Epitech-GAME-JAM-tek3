@@ -6,6 +6,7 @@
 #include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
 #include "TomatoSurvivor.hpp"
+#include "AudioManager.hpp"
 #include "Pause.hpp"
 
 namespace TomatoSurvivor
@@ -55,17 +56,19 @@ TomatoSurvivor::TomatoSurvivor() {
     _tomato->setTexture(tomato_texture);
     spawnBonus();
     music = LoadMusicStream("assets/Tears.ogg");
-    volume = 0.9f;
+    volume = 0.6f;
     pan = 0.0f;
     SetMusicPan(music, pan);
     SetMusicVolume(music, volume);
     still_alive = true;
     show_hitbox = false;
     initializePowerUps();
+    AudioManager::init();
 }
 
 TomatoSurvivor::~TomatoSurvivor() {
     CloseWindow();
+    AudioManager::unload();
 }
 
 void TomatoSurvivor::reset() {
@@ -211,6 +214,7 @@ void TomatoSurvivor::checkCollisionsArrows() {
             arrow->getPosition(), arrow->getRadius())) {
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
             _timer -= _arrowDamage;
+            AudioManager::playDamage();
             _playerInvincibility = _invincibilityTime;
         }
     }
@@ -227,6 +231,7 @@ void TomatoSurvivor::checkCollisionsBonuses() {
                 _next_DifficultyLevel += DIFFICULTY_INC;
             }
             _bonuses.erase(std::remove(_bonuses.begin(), _bonuses.end(), bonus), _bonuses.end());
+            AudioManager::playBonus();
             spawnBonus();
         }
     }

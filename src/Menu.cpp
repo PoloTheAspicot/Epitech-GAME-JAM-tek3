@@ -4,6 +4,7 @@
 #include "Shop.hpp"
 #include "Save.hpp"
 #include "Menu.hpp"
+#include "AudioManager.hpp"
 
 #define X_POS (800-371)/2
 
@@ -46,12 +47,18 @@ void menu()
         DrawText(TextFormat("Highest Score: %d", SaveManager::getBestScore()), 200, 620, 40, DARKBLUE);
         
         EndDrawing();
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover)
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover) {
+            AudioManager::playClick();
             starting = true;
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_option)
+        }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_option) {
+            AudioManager::playClick();
             option();
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_shop)
+        }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_shop) {
+            AudioManager::playClick();
             shop();
+        }
     }
     
     UnloadTexture(title);

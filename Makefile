@@ -15,6 +15,7 @@ SRC	=	$(addprefix src/, 		\
 			Death.cpp 			\
 			Pause.cpp 			\
 			PowerUps.cpp		\
+			AudioManager.cpp	\
 		)
 
 OBJ	=	$(SRC:.cpp=.o)
