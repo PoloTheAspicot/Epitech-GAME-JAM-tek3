@@ -25,8 +25,8 @@ TomatoSurvivor::TomatoSurvivor() {
     water_texture.height = _bonusSize*2;
     water_texture.width = _bonusSize*2;
     arrow_texture = LoadTexture("assets/arrow.png");
-    arrow_texture.height = _arrowSize*2;
-    arrow_texture.width = _arrowSize*2;
+    arrow_texture.height = _arrowSize*4;
+    arrow_texture.width = _arrowSize*4;
     _tomato->setTexture(tomato_texture);
     spawnBonus();
     music = LoadMusicStream("assets/Tears.ogg");
