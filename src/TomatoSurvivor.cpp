@@ -257,8 +257,8 @@ void TomatoSurvivor::checkCollisionsBonuses() {
     for (auto &bonus : _bonuses) {
         if (CheckCollisionCircles(_tomato->getPosition(), _tomato->getRadius(),
             bonus->getPosition(), bonus->getRadius())) {
-            _timer += 10;
-            _score += 100;
+            _timer += _bonusTimeGain;
+            _score += _bonusScore;
             Vector2 pos = bonus->getPosition();
             _particles.emplace_back(std::make_pair(std::make_unique<Heal>(HEAL_SIZE, pos.x, pos.y), 0));
             _particles.back().first->setTexture(heal_texture);

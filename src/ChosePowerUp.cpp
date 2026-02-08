@@ -40,6 +40,7 @@ void TomatoSurvivor::ChosePowerUp() {
         for (int i = 0; i < randomPowerUps.size(); i++) {
             if (randomPowerUps[i].render(_timer, i * 250 + 50, mouse)) {
                 choice_made = randomPowerUps[i].operate(_timer);
+                _tomato->setSpeed(_playerSpeed);
             }
         }
         DrawRectangleRec(ignore_button, RED);

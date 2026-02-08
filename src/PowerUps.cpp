@@ -12,7 +12,7 @@ PowerUp::PowerUp(float _cost, float *ref, float _value,
     description = descr;
 }
 
-bool PowerUp::canBuy(float &timer) const {
+bool PowerUp::canBuy(float timer) const {
     return (timer > cost);
 }
 
@@ -39,7 +39,7 @@ bool PowerUp::operate(float &timer) const {
     return true;
 }
 
-bool PowerUp::render(float &timer, float offset, Vector2 mouse) const {
+bool PowerUp::render(float timer, float offset, Vector2 mouse) const {
     Rectangle button = {offset, 100, 200, 500};
     bool hover = CheckCollisionPointRec(mouse, button);
     bool possible = canBuy(timer);

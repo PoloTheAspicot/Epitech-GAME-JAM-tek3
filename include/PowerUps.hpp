@@ -20,9 +20,9 @@ class PowerUp {
         OPERATION op, const char *descr);
     ~PowerUp() = default;
 
-    bool canBuy(float &timer) const;
+    bool canBuy(float timer) const;
     bool operate(float &timer) const;
-    bool render(float &timer, float offset, Vector2 mouse) const;
+    bool render(float timer, float offset, Vector2 mouse) const;
 
   private:
     float cost;
