@@ -40,6 +40,7 @@ class TomatoSurvivor {
     void spawnBonus();
     void increaseDifficulty();
     void initializePowerUps();
+    void ChosePowerUp();
 
     std::unique_ptr<IEntity> _tomato;
     std::vector<std::unique_ptr<IEntity>> _arrows;
