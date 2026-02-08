@@ -8,7 +8,6 @@
 
 namespace TomatoSurvivor {
 
-    
 class PowerUp {
   public:
     enum OPERATION {
