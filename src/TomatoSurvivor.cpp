@@ -1,16 +1,33 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 #include "entity/Tomato.hpp"
 #include "entity/Arrow.hpp"
 #include "entity/Bonus.hpp"
+#include "entity/Damage.hpp"
+#include "entity/Heal.hpp"
 #include "TomatoSurvivor.hpp"
 #include "AudioManager.hpp"
 #include "Pause.hpp"
 
 namespace TomatoSurvivor
 {
+
+static Vector2 getCollisionCircles(const Vector2 &pos1, float radius1, const Vector2 &pos2, float radius2) {
+    Vector2 collisionPoint;
+    float distance = sqrt(pow(pos2.x - pos1.x, 2) + pow(pos2.y - pos1.y, 2));
+
+    if (distance == 0) {
+        collisionPoint = pos1;
+        return collisionPoint;
+    }
+    float collisionRatio = radius1 / (radius1 + radius2);
+    collisionPoint.x = pos1.x + (pos2.x - pos1.x) * collisionRatio;
+    collisionPoint.y = pos1.y + (pos2.y - pos1.y) * collisionRatio;
+    return collisionPoint;
+}
 
 void TomatoSurvivor::initializePowerUps() {
     _allPowerUps.push_back(PowerUp(80.0, &_bonusTimeGain, 10.0, PowerUp::OPERATION::ADD,
@@ -44,8 +61,8 @@ TomatoSurvivor::TomatoSurvivor() {
 
     _tomato = std::make_unique<Tomato>(_playerSpeed, _playerSize, WINDOW_SIZE.x / 2, WINDOW_SIZE.y / 2, _playerSpeed);
     tomato_texture = LoadTexture("assets/tomato.png");
-    tomato_texture.height = _playerSize*2;
-    tomato_texture.width = _playerSize*2;
+    tomato_texture.height = _playerSize * 2;
+    tomato_texture.width = _playerSize * 2;
     water_texture = LoadTexture("assets/water_bucket.png");
     water_texture.height = _bonusSize*2;
     water_texture.width = _bonusSize*2;
@@ -55,6 +72,12 @@ TomatoSurvivor::TomatoSurvivor() {
     arrow_texture = LoadTextureFromImage(arrow_image);
     _tomato->setTexture(tomato_texture);
     spawnBonus();
+    damage_texture = LoadTexture("assets/damage.png");
+    damage_texture.height = DAMAGE_SIZE * 2;
+    damage_texture.width = DAMAGE_SIZE * 2;
+    heal_texture = LoadTexture("assets/happy_particle.png");
+    heal_texture.height = HEAL_SIZE * 2;
+    heal_texture.width = HEAL_SIZE * 2;
     music = LoadMusicStream("assets/Tears.ogg");
     volume = 0.6f;
     pan = 0.0f;
@@ -111,11 +134,10 @@ void TomatoSurvivor::update() {
         if (_tomato->getPosition().y < 0)
             _tomato->setPosition({_tomato->getPosition().x, 0});
     }
+
     for (unsigned int i = 0; i < _arrows.size(); i++) {
         auto &arrow = _arrows[i];
         arrow->update();
-    for (auto &bonus : _bonuses)
-        bonus->update();
         if (arrow->getPosition().x > GAME_SIZE.x)
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
         else if (arrow->getPosition().y > GAME_SIZE.y)
@@ -125,6 +147,17 @@ void TomatoSurvivor::update() {
         else if (arrow->getPosition().y < 0)
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
     }
+
+    for (auto &bonus : _bonuses)
+        bonus->update();
+
+    for (size_t i = 0; i < _particles.size(); i++) {
+        _particles[i].first->update();
+        _particles[i].second += 1;
+        if (_particles[i].second > PARTICLE_LIFETIME)
+            _particles.erase(std::remove(_particles.begin(), _particles.end(), _particles[i]), _particles.end());
+    }
+
     UpdateMusicStream(music);
 }
 
@@ -138,6 +171,8 @@ void TomatoSurvivor::render() {
         arrow->render(show_hitbox);
     for (auto &bonus : _bonuses)
         bonus->render(show_hitbox);
+    for (auto &particle : _particles)
+        particle.first->render(show_hitbox);
     DrawRectangle(0, 0, 800, 100, BLUE);
 
     DrawText(TextFormat(TEXT_TIME), 10, 10, 35, WHITE);
@@ -188,7 +223,7 @@ void TomatoSurvivor::loop() {
             still_alive = false;
         }
     }
-    
+
     if (!WindowShouldClose()) {
         death_menu();
     }
@@ -206,7 +241,11 @@ void TomatoSurvivor::checkCollisionsArrows() {
         auto &arrow = _arrows[i];
         if (CheckCollisionCircles(_tomato->getPosition(), _tomato->getRadius(),
             arrow->getPosition(), arrow->getRadius())) {
+            Vector2 pos = getCollisionCircles(_tomato->getPosition(), _tomato->getRadius(),
+                arrow->getPosition(), arrow->getRadius());
             _arrows.erase(std::remove(_arrows.begin(), _arrows.end(), _arrows[i]), _arrows.end());
+            _particles.emplace_back(std::make_pair(std::make_unique<Damage>(DAMAGE_SIZE, pos.x, pos.y), 0));
+            _particles.back().first->setTexture(damage_texture);
             _timer -= _arrowDamage;
             AudioManager::playDamage();
             _playerInvincibility = _invincibilityTime;
@@ -220,6 +259,9 @@ void TomatoSurvivor::checkCollisionsBonuses() {
             bonus->getPosition(), bonus->getRadius())) {
             _timer += 10;
             _score += 100;
+            Vector2 pos = bonus->getPosition();
+            _particles.emplace_back(std::make_pair(std::make_unique<Heal>(HEAL_SIZE, pos.x, pos.y), 0));
+            _particles.back().first->setTexture(heal_texture);
             if (_score >= _next_DifficultyLevel) {
                 increaseDifficulty();
                 _next_DifficultyLevel += DIFFICULTY_INC;
