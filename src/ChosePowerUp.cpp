@@ -2,6 +2,14 @@
 
 namespace TomatoSurvivor {
 
+static bool hasIndex(std::vector<int> indexes, int index) {
+    for (int i = 0; i < indexes.size(); i++) {
+        if (indexes[i] == index)
+            return true;
+    }
+    return false;
+}
+
 void TomatoSurvivor::ChosePowerUp() {
     std::vector<PowerUp> randomPowerUps;
     std::vector<int> indexes;
@@ -11,10 +19,13 @@ void TomatoSurvivor::ChosePowerUp() {
 
     for (int i = 0; i < 3; i++) {
         int randomIndex = rand() % len;
-        indexes.push_back(randomIndex);
+        if (hasIndex(indexes, randomIndex))
+            i--;
+        else
+            indexes.push_back(randomIndex);
     }
     for (int i = 0; i < indexes.size(); i++) {
-        randomPowerUps.push_back(_allPowerUps[i]);
+        randomPowerUps.push_back(_allPowerUps[indexes[i]]);
     }
 
     while (!WindowShouldClose() && !choice_made) {
@@ -32,7 +43,7 @@ void TomatoSurvivor::ChosePowerUp() {
             }
         }
         DrawRectangleRec(ignore_button, RED);
-        DrawText(TextFormat("IGNORE OFFERS"), 310, 650, 20, WHITE);
+        DrawText(TextFormat("Ignore offers"), 310, 650, 20, WHITE);
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && hover_ignore)
             choice_made = true;
         EndDrawing();
