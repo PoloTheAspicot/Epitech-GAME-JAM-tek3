@@ -7,18 +7,19 @@ namespace TomatoSurvivor {
 
 class Tomato : public AEntity {
   public:
-    Tomato(float x, float y, float vx = 0, float vy = 0) {
+    Tomato(float s, float r, float x, float y, float vx = 0, float vy = 0) {
         position = {x, y};
         velocity = {vx, vy};
         color = RED;
-        radius = 40;
+        radius = r;
+        speed = s;
     }
 
-    Tomato(Vector2 pos, Vector2 vel = {0, 0}) {
+    Tomato(float r, Vector2 pos, Vector2 vel = {0, 0}) {
         position = pos;
         velocity = vel;
         color = RED;
-        radius = 40;
+        radius = r;
     }
 
     ~Tomato() = default;
@@ -32,10 +33,10 @@ class Tomato : public AEntity {
   private:
     void input() {
         velocity = {0, 0};
-        if (IsKeyDown(Config::KEY_RIGHT_MOVE)) velocity.x = 2.0f;
-        if (IsKeyDown(Config::KEY_LEFT_MOVE)) velocity.x = -2.0f;
-        if (IsKeyDown(Config::KEY_UP_MOVE)) velocity.y = -2.0f;
-        if (IsKeyDown(Config::KEY_DOWN_MOVE)) velocity.y = 2.0f;
+        if (IsKeyDown(Config::KEY_RIGHT_MOVE)) velocity.x = speed;
+        if (IsKeyDown(Config::KEY_LEFT_MOVE)) velocity.x = -speed;
+        if (IsKeyDown(Config::KEY_UP_MOVE)) velocity.y = -speed;
+        if (IsKeyDown(Config::KEY_DOWN_MOVE)) velocity.y = speed;
     }
 };
 

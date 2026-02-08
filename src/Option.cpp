@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include "Config.hpp"
+#include "Save.hpp"
 
 const char* GetKeyName(int key) {
     switch (key) {
@@ -65,6 +66,7 @@ void option()
                 if (selecting == 1) Config::KEY_DOWN_MOVE = (KeyboardKey)key;
                 if (selecting == 2) Config::KEY_LEFT_MOVE = (KeyboardKey)key;
                 if (selecting == 3) Config::KEY_RIGHT_MOVE = (KeyboardKey)key;
+                if (selecting == 4) Config::KEY_PAUSE = (KeyboardKey)key;
                 selecting = -1;
             }
         }
@@ -73,13 +75,15 @@ void option()
         Rectangle rectDown = { 300, 250, 200, 40 };
         Rectangle rectLeft = { 300, 300, 200, 40 };
         Rectangle rectRight = { 300, 350, 200, 40 };
+        Rectangle rectPause = { 300, 400, 200, 40 };
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            if (CheckCollisionPointRec(mouse, rectUp)) selecting = 0;
-            else if (CheckCollisionPointRec(mouse, rectDown)) selecting = 1;
-            else if (CheckCollisionPointRec(mouse, rectLeft)) selecting = 2;
-            else if (CheckCollisionPointRec(mouse, rectRight)) selecting = 3;
-            else selecting = -1;
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                if (CheckCollisionPointRec(mouse, rectUp)) selecting = 0;
+                else if (CheckCollisionPointRec(mouse, rectDown)) selecting = 1;
+                else if (CheckCollisionPointRec(mouse, rectLeft)) selecting = 2;
+                else if (CheckCollisionPointRec(mouse, rectRight)) selecting = 3;
+                else if (CheckCollisionPointRec(mouse, rectPause)) selecting = 4;
+                else selecting = -1;
         }
 
         BeginDrawing();
@@ -96,15 +100,20 @@ void option()
         DrawText(TextFormat("LEFT: %s", GetKeyName(Config::KEY_LEFT_MOVE)), rectLeft.x + 10, rectLeft.y + 10, 20, BLACK);
         DrawRectangleRec(rectRight, selecting == 3 ? LIGHTGRAY : GRAY);
         DrawText(TextFormat("RIGHT: %s", GetKeyName(Config::KEY_RIGHT_MOVE)), rectRight.x + 10, rectRight.y + 10, 20, BLACK);
+        DrawRectangleRec(rectPause, selecting == 4 ? LIGHTGRAY : GRAY);
+        DrawText(TextFormat("PAUSE: %s", GetKeyName(Config::KEY_PAUSE)), rectPause.x + 10, rectPause.y + 10, 20, BLACK);
         DrawText("Press ENTER to save", 290, 500, 20, BLACK);
 
         EndDrawing();
-        if (IsKeyPressed(KEY_ENTER) && selecting == -1)
+        if (IsKeyPressed(KEY_ENTER) && selecting == -1) {
+            SaveManager::writeSave();
             starting = true;
+        }
     }
     UnloadTexture(bg);
     ClearBackground(RAYWHITE);
     if (!starting) {
+        SaveManager::writeSave();
         CloseWindow();
         exit(0);
     }
